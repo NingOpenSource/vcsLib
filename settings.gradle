@@ -1,0 +1,3 @@
+rootProject.name = 'vcsLib'
+include ':vcsLib-GUI'
+

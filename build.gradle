@@ -1,0 +1,54 @@
+buildscript {
+    ext.kotlin_version = '1.2.21'
+    ext.lib_home = 'D:\\yanning\\libs\\vcsLib\\'
+
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+group 'org.yanning.gradle'
+version '1.0'
+
+apply plugin: 'java'
+apply plugin: 'kotlin'
+apply plugin: 'maven'
+
+uploadArchives {
+
+    //本地仓库的一种
+    repositories {
+        mavenDeployer {
+            repository(url: uri("$lib_home"))
+        }
+
+//        flatDir {
+//            name "release"
+//            dir "$lib_home"
+//        }
+    }
+}
+
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile gradleApi()
+    compile 'org.eclipse.jgit:org.eclipse.jgit:+'
+    compile 'org.tmatesoft.svnkit:svnkit:+'
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
