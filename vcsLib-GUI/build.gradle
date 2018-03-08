@@ -1,3 +1,34 @@
+//
+//apply plugin: "vcsLib"
+////vcsLibUpload，vcsLib都为自定义
+//
+//vcsLibUpload{//上传至仓库
+//    repositories{
+//        svn "svn://61.160.193.26/Project/libs"//字符串
+//        svn "svn://61.160.193.26/Project/libs"//字符串
+//    }
+//}
+//
+//buildscript {
+//    vcsLib{//配置仓库地址
+//        repositories{
+//            svn "svn://61.160.193.26/Project/libs"//字符串
+//            svn "svn://61.160.193.26/Project/libs"//字符串
+//        }
+//    }
+//}
+//
+//allprojects {
+//    buildscript {
+//        vcsLib{//配置全局仓库地址
+//            repositories{
+//                svn "svn://61.160.193.26/Project/libs"//字符串
+//                svn "svn://61.160.193.26/Project/libs"//字符串
+//            }
+//        }
+//    }
+//}
+
 
 buildscript {
     ext.kotlin_version = '1.2.21'
@@ -19,9 +50,28 @@ version '1.0-SNAPSHOT'
 apply plugin: 'java'
 apply plugin: 'kotlin'
 apply plugin: 'vcsLib'
-
 vcsLibs {
-    url 'git://192.168.1.2/demo'
+    libsHome "D:\\yanning\\libs\\.vcsLib"
+    from {
+        vcs "git://192.168.1.2/demo"
+        vcs "svn://192.168.1.2/demosd2334"
+        vcs "svn://192.168.1.2/dedfsmo2334"
+        vcs "svn://192.168.1.2/dsfsdfdsemo2334"
+        vcs "svn://192.168.1.2/desdfgfhgfmo2334"
+        git {
+            url "https://github.com/Lyon1994/kotlin-web-site-cn.git"
+        }
+        svn{
+
+        }
+//        git{
+//            url "https://github.com/Lyon1994/kotlin-web-site-cn.git"
+//            username "765211630@qq.com"
+//            password "123456"
+//        }
+    }
+//    vcsLibsHome "D://yanning//libs//vcsLibs//"
+//    url 'git://192.168.1.2/demo'
 }
 buildscript {
 }
@@ -34,10 +84,10 @@ repositories {
 }
 
 dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
-
 compileKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }
