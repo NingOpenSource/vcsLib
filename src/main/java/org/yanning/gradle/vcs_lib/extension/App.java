@@ -2,15 +2,22 @@ package org.yanning.gradle.vcs_lib.extension;
 
 import org.gradle.api.Action;
 import org.gradle.api.Project;
+import org.yanning.gradle.vcs_lib.task.Controller;
 
 import java.io.File;
-import java.util.List;
 
 /**
  * 执行的主要操作
  */
 public class App extends Config {
+    public Controller controller = new Controller();
+
+
     private Project project;
+
+    public Project getProject() {
+        return project;
+    }
 
     private Repositories repositoriesFrom = new Repositories();
     private Repositories repositoriesTo = new Repositories();

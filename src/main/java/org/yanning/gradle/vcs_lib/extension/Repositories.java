@@ -2,6 +2,7 @@ package org.yanning.gradle.vcs_lib.extension;
 
 
 import org.gradle.api.Action;
+import org.yanning.gradle.vcs_lib.utils.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,8 +35,36 @@ public class Repositories {
         }
     }
 
+    public void vcs(String repository,String username,String password) {
+        for (VcsType type : VcsType.values()) {
+            if (type.isThis(repository)) {
+                switch (type) {
+                    case git: {
+                        git(repositoryGit -> {
+                            repositoryGit.url(repository);
+                            repositoryGit.username(username);
+                            repositoryGit.password(password);
+                        });
+                    }
+                    break;
+                    case svn: {
+                        svn(repositorySvn -> {
+                            repositorySvn.url(repository);
+                            repositorySvn.username(username);
+                            repositorySvn.password(password);
+                        });
+                    }
+                    break;
+                    default: {
+
+                    }
+                }
+                continue;
+            }
+        }
+    }
     public void vcs(Repository repository) {
-        System.err.println("++++++++:add url " + repository.getUrl());
+        Log.out("add url " + repository.getUrl());
         repositories.add(repository);
     }
 

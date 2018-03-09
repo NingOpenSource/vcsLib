@@ -16,12 +16,18 @@ public abstract class Repository {
     private File outDir;
 
 
-    protected File outDir() {
+    public File outDir() {
         if (outDir == null) {
-            File rootDir = FileUtils.createDir(new File(System.getProperties().getProperty(App.KEY_VCS_LIBS_HOME)));
+//            File rootDir = FileUtils.createDir(new File(System.getProperties().getProperty(App.KEY_VCS_LIBS_HOME)));
+//            try {
+//                outDir = FileUtils.createDir(new File(rootDir,
+//                        URLEncoder.encode(url, "utf-8")));
+//            } catch (UnsupportedEncodingException e) {
+//                e.printStackTrace();
+//            }
             try {
-                outDir = FileUtils.createDir(new File(rootDir,
-                        URLEncoder.encode(url, "utf-8")));
+                outDir=new File(new File(System.getProperties().getProperty(App.KEY_VCS_LIBS_HOME)),
+                        URLEncoder.encode(url, "utf-8"));
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
@@ -30,13 +36,13 @@ public abstract class Repository {
     }
 
 
-    abstract void update();
+    public abstract void update();
 
-    abstract void commit();
+    public abstract void commit();
 
-    abstract void upload();
+    public abstract void upload();
 
-    abstract VcsType vcsType();
+    public abstract VcsType vcsType();
 
     public void url(String url){
         setUrl(url);

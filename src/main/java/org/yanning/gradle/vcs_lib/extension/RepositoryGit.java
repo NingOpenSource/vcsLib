@@ -17,7 +17,7 @@ public class RepositoryGit extends Repository {
 
 
     @Override
-    void update() {
+    public void update() {
         if (getUrl() == null) return;
 
         Logging.getLogger("vcsLibs").info("update", "from " + getUrl() + " to " + outDir().getPath());
@@ -25,19 +25,19 @@ public class RepositoryGit extends Repository {
     }
 
     @Override
-    void commit() {
+    public void commit() {
         if (getUrl() == null) return;
 
     }
 
     @Override
-    void upload() {
+    public void upload() {
         if (getUrl() == null) return;
 
     }
 
     @Override
-    VcsType vcsType() {
+    public VcsType vcsType() {
         return VcsType.git;
     }
 }

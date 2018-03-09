@@ -12,10 +12,11 @@ public class Build extends DefaultTask {
 
     public void bindApp(App app) {
         this.app = app;
+        app.controller.bindBuild(this);
     }
 
     @TaskAction
-    public void build() {
+    public void doBuild() {
         if (app != null) {
             System.err.println(">>>>>>>>>>>>>>>>>>>>>>>>" + app.getVcsLibsHome().getAbsolutePath());
             app.getRepositoriesFrom().getRepositories().forEach(repository -> {

@@ -3,6 +3,7 @@ package org.yanning.gradle.vcs_lib.task;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
 import org.yanning.gradle.vcs_lib.extension.App;
+import org.yanning.gradle.vcs_lib.utils.Log;
 
 /**
  * 1,上传到本地仓库
@@ -18,14 +19,19 @@ public class Upload extends DefaultTask {
 
     public void bindApp(App app) {
         this.app = app;
+        app.controller.bindUpload(this);
     }
 
     @TaskAction
-    public void build() {
+    public void doUpload() {
         if (app != null) {
-            System.err.println(">>>>>>>>>>>>>>>>>>>>>>>>" + app.getVcsLibsHome().getAbsolutePath());
             app.getRepositoriesTo().getRepositories().forEach(repository -> {
-                System.err.println(">>>>>>>>>" + repository.getUrl());
+                Log.out("start commit...");
+                repository.commit();
+                Log.out("complete commit. ");
+                Log.out("start upload..." + " [from " + repository.outDir().getPath() + " to " + repository.getUrl() + "]");
+                repository.upload();
+                Log.out("complete doUpload.");
             });
         }
     }
