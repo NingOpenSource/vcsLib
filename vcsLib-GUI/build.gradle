@@ -49,29 +49,29 @@ version '1.0-SNAPSHOT'
 
 apply plugin: 'java'
 apply plugin: 'kotlin'
-apply plugin: 'vcsLib'
-vcsLibs {
-    libsHome "D:\\yanning\\libs\\.vcsLib"
-    from {
-        vcs "svn://61.160.193.26/android/vcsLibs", "yanning", "123456"
-//        git {
-//            url "https://github.com/Lyon1994/kotlin-web-site-cn.git"
-//        }
-//        svn{
-//
-//        }
-//        git{
-//            url "https://github.com/Lyon1994/kotlin-web-site-cn.git"
-//            username "765211630@qq.com"
-//            password "123456"
-//        }
-    }
-    to {
-        vcs "svn://61.160.193.26/android/vcsLibs", "yanning", "123456"
-    }
-//    vcsLibsHome "D://yanning//libs//vcsLibs//"
-//    url 'git://192.168.1.2/demo'
-}
+//apply plugin: 'vcsLib'
+//vcsLibs {
+//    libsHome "D:\\yanning\\libs\\.vcsLib"
+//    from {
+//        vcs "svn://61.160.193.26/android/vcsLibs", "yanning", "123456"
+////        git {
+////            url "https://github.com/Lyon1994/kotlin-web-site-cn.git"
+////        }
+////        svn{
+////
+////        }
+////        git{
+////            url "https://github.com/Lyon1994/kotlin-web-site-cn.git"
+////            username "765211630@qq.com"
+////            password "123456"
+////        }
+//    }
+//    to {
+//        vcs "svn://61.160.193.26/android/vcsLibs", "yanning", "123456"
+//    }
+////    vcsLibsHome "D://yanning//libs//vcsLibs//"
+////    url 'git://192.168.1.2/demo'
+//}
 buildscript {
 }
 
