@@ -4,16 +4,20 @@ buildscript {
 
     repositories {
         mavenCentral()
+        jcenter()
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.novoda:bintray-release:+'
     }
 }
+
 
 group 'org.yanning.gradle'
 version '1.0.1'
 
 apply plugin: 'java'
+apply plugin: 'java-library'
 apply plugin: 'kotlin'
 apply plugin: 'maven'
 
@@ -34,6 +38,19 @@ uploadArchives {
 //            dir "$lib_home"
 //        }
     }
+}
+
+
+apply plugin: 'com.novoda.bintray-release'
+
+publish {
+    userOrg = 'ning1994'
+    groupId = 'org.yanning.gradle'
+    artifactId = 'vcsLib'
+    publishVersion = '1.0.1'
+    desc = 'Oh hi, this is a nice description for a project, right?'
+    website = 'https://github.com/NingOpenSource/vcsLib'
+
 }
 
 
