@@ -1,0 +1,34 @@
+package org.yanning.gradle.vcs_lib
+
+group = "org.yanning.gradle"
+version = "1.0.6"
+
+plugins {
+    java
+    maven
+}
+
+
+buildscript {
+
+
+}
+
+tasks {
+    "vcsLibsUpload"(Upload.class) {
+
+    }
+}
+
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: uri("$VCS_LIBS_HOME"))
+        }
+    }
+}
+
+//configure<uploadArchives>{
+//
+//}

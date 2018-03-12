@@ -7,7 +7,7 @@ import org.yanning.gradle.vcs_lib.utils.Log;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Repositories {
+public class RepositoriesFrom {
     private List<Repository> repositories = new ArrayList<>();
 
     public void vcs(String repository) {

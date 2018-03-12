@@ -1,3 +1,4 @@
 rootProject.name = 'vcsLib'
 include ':vcsLib-GUI'
+include 'lib_vcs_demo'
 

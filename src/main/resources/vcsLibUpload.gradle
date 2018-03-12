@@ -1,0 +1,36 @@
+apply plugin: 'java'
+apply plugin: 'java-library'
+apply plugin: 'maven'
+
+group "$VCS_LIBS_GROUP_ID"
+//name "$VCS_LIBS_ARTIFACT_ID"
+version "$VCS_LIBS_VERSION"
+//ap
+task sourcesJar(type: Jar) {
+    from sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+//javadoc(type: Javadoc) {
+//    options.encoding "UTF-8"
+//    options.charSet 'UTF-8'
+//    source = sourceSets.main.java.srcDirs
+//    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+//}
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    javadoc.options.encoding "UTF-8"
+    javadoc.options.charSet 'UTF-8'
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: uri("$VCS_LIBS_HOME"))
+        }
+    }
+}
