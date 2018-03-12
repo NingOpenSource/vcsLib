@@ -9,6 +9,8 @@ import org.yanning.gradle.vcs_lib.vcsLib;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 执行的主要操作
@@ -69,7 +71,7 @@ public class App {
 //        System.getProperties().put(KEY_VCS_LIBS_GROUP_ID, repositoriesTo.getGroupId());
 //        System.getProperties().put(KEY_VCS_LIBS_ARTIFACT_ID, repositoriesTo.getGroupId());
 //        System.getProperties().put(KEY_VCS_LIBS_VERSION, repositoriesTo.getVersion());
-        autoImport();
+        autoConfigTo();
     }
 
     /**
@@ -84,7 +86,7 @@ public class App {
      */
     public void libsHome(String libsHome) {
         libsHome(new File(libsHome));
-        autoImport();
+        autoConfigTo();
     }
 
     public RepositoriesFrom getRepositoriesFrom() {
@@ -95,8 +97,17 @@ public class App {
         return repositoriesTo;
     }
 
+    private void autoConfigFrom(){
+        final String tag="repository(url: uri(\"$lib_home\"))\n";
+        if (vcsLibsHome!=null){
+            StringBuffer strings=new StringBuffer();
+            repositoriesFrom.getRepositories().forEach(repository -> {
+//                strings.append(tag.replace("\"$lib_home"+))
+            });
+        }
+    }
 
-    public void autoImport(){
+    private void autoConfigTo(){
         if (repositoriesTo.getGroupId()!=null&&repositoriesTo.getArtifactId()!=null&&repositoriesTo.getVersion()!=null
                 &&vcsLibsHome!=null){
             if (repositoriesTo.getGroupId() == null) {
