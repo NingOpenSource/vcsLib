@@ -5,82 +5,83 @@ buildscript {
     repositories {
         mavenCentral()
         jcenter()
+
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-//        classpath 'com.novoda:bintray-release:+'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:+'
+        classpath 'com.novoda:bintray-release:+'
+//        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:+'
 
     }
 }
 
 
 group 'org.yanning.gradle'
-version '1.0.3'
+version '1.0.5'
 
 apply plugin: 'java'
 apply plugin: 'java-library'
 apply plugin: 'kotlin'
 apply plugin: 'maven'
-//apply plugin: 'com.novoda.bintray-release'
-//
-////这里是配置library上传的资料区
-//publish {
-//    userOrg = 'NingOpenSource'
-//    groupId = this.group
-//    artifactId = this.name
-//    version = this.version
-//    description = 'a gradle plugin to use vcs libs'
-//    website = "https://github.com/NingOpenSource/vcsLib"
-//}
-apply plugin: 'com.jfrog.bintray'
+apply plugin: 'com.novoda.bintray-release'
 
-def siteUrl = 'https://github.com/NingOpenSource/vcsLib'      // 项目的主页
-def gitUrl = 'https://github.com/NingOpenSource/vcsLib.git'   // Git仓库的url
-Properties properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
-bintray {
-    user = properties.getProperty("bintray.user")
-    key = properties.getProperty("bintray.apikey")
-    pkg {
-        repo = 'maven'
-        name = 'vcsLib'
-        userOrg = 'ningopensource'
-        licenses = ['Apache-2.0']
-        vcsUrl = 'https://github.com/NingOpenSource/vcsLib'
-    }
+//这里是配置library上传的资料区
+publish {
+    userOrg = 'ningopensource'
+    groupId = this.group
+    artifactId = this.name
+    version = this.version
+    description = 'a gradle plugin to use vcs libs'
+    website = "https://github.com/NingOpenSource/vcsLib"
 }
-install {
-    repositories.mavenInstaller {
-        // This generates POM.xml with proper parameters
-        pom.artifactId = this.name
-        pom {
-            project {
-                packaging 'jar'
-                name this.name
-                url siteUrl
-                licenses {
-                    license {
-                        name 'The Apache Software License, Version 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                    }
-                }
-                developers {
-                    developer {
-                        id 'ning1994'
-                        name 'ning1994'
-                        email 'yanning19940131@outlook.com'
-                    }
-                }
-                scm {
-                    connection gitUrl
-                    developerConnection gitUrl
-                    url siteUrl
-                }
-            }
-        }
-    }
-}
+//apply plugin: 'com.jfrog.bintray'
+//
+//def siteUrl = 'https://github.com/NingOpenSource/vcsLib'      // 项目的主页
+//def gitUrl = 'https://github.com/NingOpenSource/vcsLib.git'   // Git仓库的url
+//Properties properties = new Properties()
+//properties.load(project.rootProject.file('local.properties').newDataInputStream())
+//bintray {
+//    user = properties.getProperty("bintray.user")
+//    key = properties.getProperty("bintray.apikey")
+//    pkg {
+//        repo = 'maven'
+//        name = 'vcsLib'
+//        userOrg = 'ningopensource'
+//        licenses = ['Apache-2.0']
+//        vcsUrl = 'https://github.com/NingOpenSource/vcsLib'
+//    }
+//}
+//install {
+//    repositories.mavenInstaller {
+//        // This generates POM.xml with proper parameters
+//        pom.artifactId = this.name
+//        pom {
+//            project {
+//                packaging 'jar'
+//                name this.name
+//                url siteUrl
+//                licenses {
+//                    license {
+//                        name 'The Apache Software License, Version 2.0'
+//                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+//                    }
+//                }
+//                developers {
+//                    developer {
+//                        id 'ning1994'
+//                        name 'ning1994'
+//                        email '765211630@qq.com'
+//                    }
+//                }
+//                scm {
+//                    connection gitUrl
+//                    developerConnection gitUrl
+//                    url siteUrl
+//                }
+//            }
+//        }
+//    }
+//}
 //
 
 task sourcesJar(type: Jar) {
