@@ -1,4 +1,8 @@
 # vcsLib
+
+[![License](https://img.shields.io/badge/license-Apache%202-green.svg)](https://www.apache.org/licenses/LICENSE-2.0)
+[![Download](https://api.bintray.com/packages/ningopensource/maven/vcsLib/images/download.svg) ](https://bintray.com/ningopensource/maven/vcsLib/_latestVersion)
+
 <p>
 <a href='https://bintray.com/ningopensource/maven/vcsLib?source=watch' alt='Get automatic notifications about new "vcsLib" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_color.png'></a>
 </P>

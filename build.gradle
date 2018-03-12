@@ -10,8 +10,6 @@ buildscript {
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'com.novoda:bintray-release:+'
-//        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:+'
-
     }
 }
 
@@ -34,56 +32,7 @@ publish {
     description = 'a gradle plugin to use vcs libs'
     website = "https://github.com/NingOpenSource/vcsLib"
 }
-//apply plugin: 'com.jfrog.bintray'
-//
-//def siteUrl = 'https://github.com/NingOpenSource/vcsLib'      // 项目的主页
-//def gitUrl = 'https://github.com/NingOpenSource/vcsLib.git'   // Git仓库的url
-//Properties properties = new Properties()
-//properties.load(project.rootProject.file('local.properties').newDataInputStream())
-//bintray {
-//    user = properties.getProperty("bintray.user")
-//    key = properties.getProperty("bintray.apikey")
-//    pkg {
-//        repo = 'maven'
-//        name = 'vcsLib'
-//        userOrg = 'ningopensource'
-//        licenses = ['Apache-2.0']
-//        vcsUrl = 'https://github.com/NingOpenSource/vcsLib'
-//    }
-//}
-//install {
-//    repositories.mavenInstaller {
-//        // This generates POM.xml with proper parameters
-//        pom.artifactId = this.name
-//        pom {
-//            project {
-//                packaging 'jar'
-//                name this.name
-//                url siteUrl
-//                licenses {
-//                    license {
-//                        name 'The Apache Software License, Version 2.0'
-//                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-//                    }
-//                }
-//                developers {
-//                    developer {
-//                        id 'ning1994'
-//                        name 'ning1994'
-//                        email '765211630@qq.com'
-//                    }
-//                }
-//                scm {
-//                    connection gitUrl
-//                    developerConnection gitUrl
-//                    url siteUrl
-//                }
-//            }
-//        }
-//    }
-//}
-//
-
+//ap
 task sourcesJar(type: Jar) {
     from sourceSets.main.java.srcDirs
     classifier = 'sources'
@@ -119,20 +68,6 @@ uploadArchives {
     }
 }
 
-//apply plugin: 'com.novoda.bintray-release'
-//
-//publish {
-//    userOrg = 'ning1994'
-//    groupId = 'org.yanning.gradle'
-//    artifactId = 'vcsLib'
-//    publishVersion = '1.0.3'
-//    desc = 'Oh hi, this is a nice description for a project, right?'
-//    website = 'https://github.com/NingOpenSource/vcsLib'
-//
-//    bintrayUser = "yn1994"
-//    bintrayKey = "6a95f8f60230926b670b41cd06568145bbbba62d"
-//    dryRun = false
-//}
 
 
 sourceCompatibility = 1.8
