@@ -33,10 +33,10 @@ class vcsLib : Plugin<Project> {
                 it.bindApp(app)
                 it.bindOutDirAction {
                     it.forEach {
-                        target?.repositories?.maven { t: MavenArtifactRepository? ->
-                            t?.url = it.toURI()
-                            Log.out("add maven url->" + t?.url)
-                        }
+                        Log.out("add maven url->" + it?.toURI()?.toString())
+//                        target?.repositories?.maven { t: MavenArtifactRepository? ->
+//                            t?.url = it.toURI()
+//                        }
                     }
                 }
             }

@@ -59,6 +59,7 @@ public class App {
         repositoriesFrom.getRepositories().forEach(repository -> {//更新每一个仓库的地址
             repository.update();
         });
+        autoConfigFrom();
     }
 
     /**
@@ -97,19 +98,40 @@ public class App {
         return repositoriesTo;
     }
 
-    private void autoConfigFrom(){
-        final String tag="repository(url: uri(\"$lib_home\"))\n";
-        if (vcsLibsHome!=null){
-            StringBuffer strings=new StringBuffer();
+    private void autoConfigFrom() {
+        final String fileName = "vcsLibUpdate.gradle";
+        final String tag = "maven { url \"$lib_home\" }\n";
+        if (vcsLibsHome != null) {
+            StringBuffer strings = new StringBuffer();
             repositoriesFrom.getRepositories().forEach(repository -> {
-//                strings.append(tag.replace("\"$lib_home"+))
+//                if (System.getProperty("os.name").startsWith("win")){
+//                    strings.append(tag.replace("$lib_home", repository.outDir().getPath()));
+//                }else {
+                    strings.append(tag.replace("$lib_home", repository.outDir().toURI().toString()));
+//                }
             });
+            File fileScript = new File(project.getBuildDir(), fileName);
+            try {
+                    FileUtil.writeString(
+                            fileScript,
+                            FileUtil.readUTFString(vcsLib.class.getResourceAsStream("/" + fileName))
+                                    .replace("$repositories", strings.toString())
+                    );
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            project.apply(objectConfigurationAction -> {
+                objectConfigurationAction.from(fileScript);
+            });
+//                    app.getProject().getTasks().findByName("uploadArchives").doLast("",task -> {
+//                       Log.out("uploadArchives after...");
+//                    });
         }
     }
 
-    private void autoConfigTo(){
-        if (repositoriesTo.getGroupId()!=null&&repositoriesTo.getArtifactId()!=null&&repositoriesTo.getVersion()!=null
-                &&vcsLibsHome!=null){
+    private void autoConfigTo() {
+        if (repositoriesTo.getGroupId() != null && repositoriesTo.getArtifactId() != null && repositoriesTo.getVersion() != null
+                && vcsLibsHome != null) {
             if (repositoriesTo.getGroupId() == null) {
                 Log.err("not set groupId");
                 return;
