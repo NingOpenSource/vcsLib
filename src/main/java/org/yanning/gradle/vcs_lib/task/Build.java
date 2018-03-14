@@ -18,7 +18,7 @@ public class Build extends DefaultTask {
     @TaskAction
     public void doBuild() {
         if (app != null) {
-            System.err.println(">>>>>>>>>>>>>>>>>>>>>>>>" + app.getVcsLibsHome().getAbsolutePath());
+            System.err.println(">>>>>>>>>>>>>>>>>>>>>>>>" + app.getVcsLibHome().getAbsolutePath());
             app.getRepositoriesFrom().getRepositories().forEach(repository -> {
                 System.err.println(">>>>>>>>>" + repository.getUrl());
             });

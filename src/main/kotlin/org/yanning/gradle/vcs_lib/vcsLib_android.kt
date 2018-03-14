@@ -12,9 +12,10 @@ import org.yanning.gradle.vcs_lib.task.Upload
 import org.yanning.gradle.vcs_lib.utils.Log
 import java.io.File
 
-class vcsLib : Plugin<Project> {
+class vcsLib_android : Plugin<Project> {
 
     override fun apply(target: Project?) {
-        Base.apply(target, PlugType.java)
+        Base.apply(target,PlugType.android)
     }
+
 }

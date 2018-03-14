@@ -1,0 +1,38 @@
+if (pluginManager.findPlugin("maven") == null) {
+    apply plugin: 'maven'
+}
+
+group "$VCS_LIB_GROUP_ID"
+//name "$VCS_LIB_ARTIFACT_ID"
+version "$VCS_LIB_VERSION"
+
+
+task androidJavadocs(type: Javadoc) {
+    options.encoding = "utf-8"
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
+    androidJavadocs.options.encoding "UTF-8"
+    androidJavadocs.options.charSet 'UTF-8'
+    classifier = 'javadoc'
+    from androidJavadocs.destinationDir
+}
+
+task androidSourcesJar(type: Jar) {
+    classifier = 'sources'
+    from android.sourceSets.main.java.sourceFiles
+}
+
+artifacts {
+    archives androidSourcesJar
+//    archives androidJavadocsJar
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: uri("$VCS_LIB_HOME"))
+        }
+    }
+}

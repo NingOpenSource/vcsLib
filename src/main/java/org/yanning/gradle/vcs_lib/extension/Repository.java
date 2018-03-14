@@ -26,7 +26,7 @@ public abstract class Repository {
 //                e.printStackTrace();
 //            }
             try {
-                outDir=new File(new File(System.getProperties().getProperty(App.KEY_VCS_LIBS_HOME)),
+                outDir=new File(new File(System.getProperties().getProperty(App.KEY_VCS_LIB_HOME)),
                         URLEncoder.encode(url, "utf-8"));
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();

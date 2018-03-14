@@ -1,16 +1,10 @@
-if (pluginManager.findPlugin("java")==null){
-    apply plugin: 'java'
-}
-if (pluginManager.findPlugin("java-library")==null){
-    apply plugin: 'java-library'
-}
-if (pluginManager.findPlugin("maven")==null){
+if (pluginManager.findPlugin("maven") == null) {
     apply plugin: 'maven'
 }
 
-group "$VCS_LIBS_GROUP_ID"
-//name "$VCS_LIBS_ARTIFACT_ID"
-version "$VCS_LIBS_VERSION"
+group "$VCS_LIB_GROUP_ID"
+//name "$VCS_LIB_ARTIFACT_ID"
+version "$VCS_LIB_VERSION"
 //ap
 task sourcesJar(type: Jar) {
     from sourceSets.main.java.srcDirs
@@ -29,14 +23,14 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     from javadoc.destinationDir
 }
 artifacts {
-    archives javadocJar
+//    archives javadocJar
     archives sourcesJar
 }
 
 uploadArchives {
     repositories {
         mavenDeployer {
-            repository(url: uri("$VCS_LIBS_HOME"))
+            repository(url: uri("$VCS_LIB_HOME"))
         }
     }
 }
