@@ -15,7 +15,7 @@ buildscript {
 
 
 group 'org.yanning.gradle'
-version '1.0.18'
+version '1.0.19'
 
 apply plugin: 'java'
 apply plugin: 'java-library'

@@ -122,12 +122,12 @@ public class App {
                         FileUtil.readUTFString(vcsLib.class.getResourceAsStream("/" + fileName))
                                 .replace("$repositories", strings.toString())
                 );
+                project.apply(objectConfigurationAction -> {
+                    objectConfigurationAction.from(fileScript);
+                });
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            project.apply(objectConfigurationAction -> {
-                objectConfigurationAction.from(fileScript);
-            });
 //                    app.getProject().getTasks().findByName("uploadArchives").doLast("",task -> {
 //                       Log.out("uploadArchives after...");
 //                    });
@@ -157,15 +157,15 @@ public class App {
                                     .replace("$" + App.KEY_VCS_LIB_VERSION, repositoriesTo.getVersion())
                                     .replace("$" + App.KEY_VCS_LIB_HOME, repository.outDir().toURI().toString())
                     );
+                    project.apply(objectConfigurationAction -> {
+                        objectConfigurationAction.from(fileScript);
+                    });
+                    project.getTasks().findByName("vcsLibUpload").dependsOn(project.getTasks().findByName("uploadArchives").doFirst(task -> {
+                        Log.err("uploadArchives ------------------> vcsLibUpload");
+                    }).getPath());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                project.apply(objectConfigurationAction -> {
-                    objectConfigurationAction.from(fileScript);
-                });
-                project.getTasks().findByName("vcsLibUpload").dependsOn(project.getTasks().findByName("uploadArchives").doFirst(task -> {
-                    Log.err("uploadArchives ------------------> vcsLibUpload");
-                }).getPath());
 //                    app.getProject().getTasks().findByName("uploadArchives").doLast("",task -> {
 //                       Log.out("uploadArchives after...");
 //                    });
