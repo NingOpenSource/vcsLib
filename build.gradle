@@ -1,6 +1,6 @@
 buildscript {
     ext.kotlin_version = '1.2.21'
-    ext.lib_home = 'D:\\yanning\\libs\\vcsLib\\'
+//    ext.lib_home = 'D:\\yanning\\libs\\vcsLib\\'
 
     repositories {
         mavenCentral()
@@ -15,7 +15,7 @@ buildscript {
 
 
 group 'org.yanning.gradle'
-version '1.0.19'
+version '1.0.20'
 
 apply plugin: 'java'
 apply plugin: 'java-library'
@@ -53,20 +53,20 @@ artifacts {
     archives javadocJar
     archives sourcesJar
 }
-uploadArchives {
-
-    //本地仓库的一种
-    repositories {
-        mavenDeployer {
-            repository(url: uri("$lib_home"))
-        }
-
-//        flatDir {
-//            name "release"
-//            dir "$lib_home"
+//uploadArchives {
+//
+//    //本地仓库的一种
+//    repositories {
+//        mavenDeployer {
+//            repository(url: uri("$lib_home"))
 //        }
-    }
-}
+//
+////        flatDir {
+////            name "release"
+////            dir "$lib_home"
+////        }
+//    }
+//}
 
 
 
