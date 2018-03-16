@@ -49,13 +49,13 @@ https://github.com/zacker330/jshint-gradle
     
         vcsLib{
             from{   // add a vcs repository
-                vcs "svn://61.160.193.26/android/.vcsLibs", "username", "password" //config svn or git repository
+                vcs "svn://192.168.0.1/android/.vcsLibs", "username", "password" //config svn or git repository
             }
             to{     //config maven, publish java or android library to vcs repository
                 groupId "com.github.NingOpenSource"
                 artifactId 'LogFormat'
                 version "0.0.3"
-                vcs "svn://61.160.193.26/android/.vcsLibs", "username", "password" //config svn or git repository
+                vcs "svn://192.168.0.1/android/.vcsLibs", "username", "password" //config svn or git repository
             }
         }
         
