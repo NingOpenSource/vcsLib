@@ -21,6 +21,19 @@ https://github.com/zacker330/jshint-gradle
                 classpath "org.yanning.gradle:vcsLib:1.0.18"  //lastest version
             }
         }
+        
+    **or**
+    
+        buildscript {
+            repositories {
+                jcenter()  //required
+                maven { url 'https://jitpack.io' }  //required
+            }
+            dependencies {
+                classpath 'com.github.NingOpenSource:vcsLib:+'  //lastest version
+            }
+        }
+        
 
 2. config step 2>>`$projectDir/build.gradle`:
     
