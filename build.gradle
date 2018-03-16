@@ -15,7 +15,7 @@ buildscript {
 
 
 group 'org.yanning.gradle'
-version '1.0.20'
+version '1.0.21'
 
 apply plugin: 'java'
 apply plugin: 'java-library'
@@ -53,20 +53,20 @@ artifacts {
     archives javadocJar
     archives sourcesJar
 }
-//uploadArchives {
-//
-//    //本地仓库的一种
-//    repositories {
-//        mavenDeployer {
-//            repository(url: uri("$lib_home"))
+uploadArchives {
+
+    //本地仓库的一种
+    repositories {
+        mavenDeployer {
+            repository(url: uri('D:\\yanning\\libs\\vcsLib\\'))
+        }
+
+//        flatDir {
+//            name "release"
+//            dir "$lib_home"
 //        }
-//
-////        flatDir {
-////            name "release"
-////            dir "$lib_home"
-////        }
-//    }
-//}
+    }
+}
 
 
 
