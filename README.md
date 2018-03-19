@@ -67,7 +67,7 @@ https://github.com/zacker330/jshint-gradle
     
     **IDE**：
     
-    ![](./pic/20180314162631.png)
+    ![](./pic/20180319105810.png)
         
 4. dependencies
         
