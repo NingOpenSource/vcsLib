@@ -26,7 +26,9 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 public class RepositoryGit extends Repository {
@@ -125,14 +127,14 @@ public class RepositoryGit extends Repository {
         loadGit(git -> {
             try {
                 List<DiffEntry> diffEntries = git.diff()
-                        .setPathFilter(PathFilterGroup.createFromStrings("/"))
+//                        .setPathFilter(PathFilterGroup.createFromStrings(outDir().getPath()))
                         .setShowNameAndStatusOnly(true).call();
                 if (diffEntries == null || diffEntries.size() == 0) {
-                    throw new Exception("提交的文件内容都没有被修改，不能提交");
+                    throw new RuntimeException("提交的文件内容都没有被修改，不能提交");
                 }
                 //被修改过的文件
                 List<String> updateFiles = new ArrayList<String>();
-                ChangeType changeType;
+                DiffEntry.ChangeType changeType;
                 for (DiffEntry entry : diffEntries) {
                     changeType = entry.getChangeType();
                     switch (changeType) {
@@ -155,7 +157,7 @@ public class RepositoryGit extends Repository {
                 }
                 addCmd.call();
                 git.add().addFilepattern("*").call();
-                git.commit().setMessage("upload new version:" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).call();
+                git.commit().setMessage("upload new version:" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())).call();
             } catch (GitAPIException e) {
                 e.printStackTrace();
             }

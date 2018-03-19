@@ -3,6 +3,7 @@ package org.yanning.gradle.vcs_lib
 import org.gradle.api.Project
 import org.yanning.gradle.vcs_lib.core.PlugType
 import org.yanning.gradle.vcs_lib.extension.App
+import org.yanning.gradle.vcs_lib.extension.RepositoryGit
 import org.yanning.gradle.vcs_lib.task.Build
 import org.yanning.gradle.vcs_lib.task.Update
 import org.yanning.gradle.vcs_lib.task.Upload
