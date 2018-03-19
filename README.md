@@ -18,7 +18,7 @@ https://github.com/zacker330/jshint-gradle
                 jcenter()  //required
             }
             dependencies {
-                classpath "org.yanning.gradle:vcsLib:1.0.18"  //lastest version
+                classpath "org.yanning.gradle:vcsLib:+"  //lastest version
             }
         }
         
