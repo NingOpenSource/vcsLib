@@ -22,7 +22,7 @@ https://github.com/zacker330/jshint-gradle
             }
         }
 ```
-    **or**
+**or** 
 ```gradle
         buildscript {
             repositories {
@@ -37,17 +37,15 @@ https://github.com/zacker330/jshint-gradle
 
 2. config step 2>>`$projectDir/build.gradle`:
     
-    Android:
+Android:
 ```gradle
         apply plugin: 'vcsLib_android'
-```    
-    Java:
-    
+```
+Java:    
 ```gradle
         apply plugin: 'vcsLib'
 ```
-    Then:
-    
+Then: 
 ```gradle
         vcsLib{
             from{   // add a vcs repository
@@ -64,13 +62,13 @@ https://github.com/zacker330/jshint-gradle
         
 3. publish java or android library to vcs repository
     
-    **CMD**：
-```gradle        
+**CMD**：
+```gradle    
         gradle :[module_name]:vcsLibUpload
-```    
-    **IDE**：
+```
+**IDE**：
     
-    ![](./pic/20180319110507.png)
+![](./pic/20180319110507.png)
         
 4. dependencies
 ```gradle        
