@@ -38,15 +38,17 @@ https://github.com/zacker330/jshint-gradle
 2. config step 2>>`$projectDir/build.gradle`:
     
     Android:
-    ```gradle
+```gradle
         apply plugin: 'vcsLib_android'
-    ```    
+```    
     Java:
-    ```gradle
+    
+```gradle
         apply plugin: 'vcsLib'
-    ```
+```
     Then:
-    ```gradle
+    
+```gradle
         vcsLib{
             from{   // add a vcs repository
                 vcs "svn://192.168.0.1/android/.vcsLibs", "username", "password" //config svn or git repository
@@ -58,27 +60,28 @@ https://github.com/zacker330/jshint-gradle
                 vcs "svn://192.168.0.1/android/.vcsLibs", "username", "password" //config svn or git repository
             }
         }
-     ```   
+```   
         
 3. publish java or android library to vcs repository
     
     **CMD**：
-        
+```gradle        
         gradle :[module_name]:vcsLibUpload
-    
+```    
     **IDE**：
     
     ![](./pic/20180319110507.png)
         
 4. dependencies
-        
+```gradle        
         dependencies {
             compile 'com.github.NingOpenSource:LogFormat:0.0.3'
         }
-
+```
 
 ### upload to jcenter:
 
 **CMD**
-    
+```gradle    
         gradle clean build install generatePomFileForMavenPublication bintrayUpload -PbintrayUser=[username] -PbintrayKey=[userkey] -PdryRun=false
+```        
