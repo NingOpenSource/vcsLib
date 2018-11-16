@@ -12,7 +12,7 @@ https://github.com/zacker330/jshint-gradle
 ### How to use?
 
 1. config step 1>>`$rootDir/build.gradle`:
-    
+```gradle
         buildscript {
             repositories {
                 jcenter()  //required
@@ -21,9 +21,9 @@ https://github.com/zacker330/jshint-gradle
                 classpath "org.yanning.gradle:vcsLib:+"  //lastest version
             }
         }
-        
+```
     **or**
-    
+```gradle
         buildscript {
             repositories {
                 jcenter()  //required
@@ -33,20 +33,20 @@ https://github.com/zacker330/jshint-gradle
                 classpath 'com.github.NingOpenSource:vcsLib:+'  //lastest version
             }
         }
-        
+```        
 
 2. config step 2>>`$projectDir/build.gradle`:
     
     Android:
-        
+    ```gradle
         apply plugin: 'vcsLib_android'
-        
+    ```    
     Java:
-    
+    ```gradle
         apply plugin: 'vcsLib'
-    
+    ```
     Then:
-    
+    ```gradle
         vcsLib{
             from{   // add a vcs repository
                 vcs "svn://192.168.0.1/android/.vcsLibs", "username", "password" //config svn or git repository
@@ -58,6 +58,7 @@ https://github.com/zacker330/jshint-gradle
                 vcs "svn://192.168.0.1/android/.vcsLibs", "username", "password" //config svn or git repository
             }
         }
+     ```   
         
 3. publish java or android library to vcs repository
     
