@@ -115,7 +115,7 @@ public class App {
                 strings.append(tag.replace("$lib_home", repository.outDir().toURI().toString()));
 //                }
             });
-            File fileScript = new File(project.getBuildDir(), fileName);
+            File fileScript = new File(project.getProjectDir(), fileName);
             try {
                 FileUtil.writeString(
                         fileScript,
@@ -147,7 +147,7 @@ public class App {
                 fileScriptName = "vcsLibUpload_android.gradle";
             }
             {
-                File fileScript = new File(project.getBuildDir(), fileScriptName);
+                File fileScript = new File(project.getProjectDir(), fileScriptName);
                 try {
                     FileUtil.writeString(
                             fileScript,

@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlin_version = '1.2.21'
+    ext.kotlin_version = '1.2.71'
 //    ext.lib_home = 'D:\\yanning\\libs\\vcsLib\\'
 
     repositories {
@@ -15,7 +15,7 @@ buildscript {
 
 
 group 'org.yanning.gradle'
-version '1.0.22'
+version '1.1.1'
 
 apply plugin: 'java'
 apply plugin: 'java-library'
@@ -28,8 +28,9 @@ publish {
     userOrg = 'ningopensource'
     groupId = this.group
     artifactId = this.name
-    version = this.version
+    publishVersion = this.version
     description = 'a gradle plugin to use vcs libs'
+    desc = description
     website = "https://github.com/NingOpenSource/vcsLib"
 }
 //ap
