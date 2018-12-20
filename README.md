@@ -1,5 +1,7 @@
 # vcsLib
 
+v2.0版本开发中,使用将会更简洁
+
 [![Download](https://api.bintray.com/packages/ningopensource/maven/vcsLib/images/download.svg) ](https://bintray.com/ningopensource/maven/vcsLib)
 [![](https://jitpack.io/v/NingOpenSource/vcsLib.svg)](https://jitpack.io/#NingOpenSource/vcsLib)
 
