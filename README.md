@@ -1,12 +1,20 @@
 # vcsLib
 
-v2.0版本开发中,使用将会更简洁
+v2.0版本测试中，改进方向
+1. 配置不再放在`build.gradle`中，新建配置文件`vcsLib.conf`
+1. 提供一个GUI版本的配置工具
+1. vsc仓库的更新操作不再跟随`gradle build`操作（防止SVN目录锁住）
+1. 待续...
+
+
+
+
 
 [![Download](https://api.bintray.com/packages/ningopensource/maven/vcsLib/images/download.svg) ](https://bintray.com/ningopensource/maven/vcsLib)
 [![](https://jitpack.io/v/NingOpenSource/vcsLib.svg)](https://jitpack.io/#NingOpenSource/vcsLib)
 
 
-用于gradle的vcs库管理
+用于gradle的vcs库管理，目前支持git以及SVN当作maven仓库
 
 https://www.jianshu.com/p/944bb00355e2
 
