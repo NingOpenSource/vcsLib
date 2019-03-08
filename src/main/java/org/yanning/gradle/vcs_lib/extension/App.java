@@ -3,27 +3,25 @@ package org.yanning.gradle.vcs_lib.extension;
 import jodd.io.FileUtil;
 import org.gradle.api.Action;
 import org.gradle.api.Project;
-import org.gradle.internal.impldep.aQute.bnd.service.Plugin;
-import org.yanning.gradle.vcs_lib.core.PlugType;
+import org.yanning.gradle.vcs_lib.core.AppConfig;
+import org.yanning.gradle.vcs_lib.core.LibrarySuffix;
 import org.yanning.gradle.vcs_lib.task.Controller;
 import org.yanning.gradle.vcs_lib.utils.Log;
 import org.yanning.gradle.vcs_lib.vcsLib;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 执行的主要操作
  */
 public class App {
-    private PlugType plugType;
+    private LibrarySuffix libSuffix;
 
-    public App(Project project, PlugType plugType) {
+    public App(Project project, LibrarySuffix libSuffix) {
         this.project = project;
-        this.plugType = plugType;
-        setVcsLibHome(new File(System.getProperty("user.home"), ".vcsLib"));
+        this.libSuffix = libSuffix;
+        setVcsLibHome(AppConfig.INSTANCE.getDefaultVCSLibPath());
     }
 
     public Controller controller = new Controller();
@@ -143,7 +141,7 @@ public class App {
             }
             Repository repository = repositoriesTo.getRepositories().get(0);
             String fileScriptName = "vcsLibUpload.gradle";
-            if (plugType == PlugType.android) {
+            if (libSuffix == libSuffix.AAR) {
                 fileScriptName = "vcsLibUpload_android.gradle";
             }
             {

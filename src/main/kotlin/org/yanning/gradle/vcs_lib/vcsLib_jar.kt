@@ -4,9 +4,8 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.yanning.gradle.vcs_lib.core.PlugType
 
-class vcsLib : Plugin<Project> {
-
-    override fun apply(target: Project?) {
+class vcsLib_jar : Plugin<Project> {
+    override fun apply(target: Project) {
         BaseLibUpload.apply(target, PlugType.java)
     }
 }
