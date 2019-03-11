@@ -6,32 +6,24 @@ import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.internal.wc.DefaultSVNOptions;
 import org.tmatesoft.svn.core.wc.*;
+import org.yanning.gradle.vcs_lib.core.VCSLibConf;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class RepositorySvn extends Repository {
-    private String username;
-    private String password;
     private DefaultSVNOptions options = SVNWCUtil.createDefaultOptions(true);
 
-
-    public void password(String password) {
-        this.password = password;
-    }
-
-    public void username(String username) {
-        this.username = username;
+    public RepositorySvn(VCSLibConf conf) {
+        super(conf);
     }
 
     @Override
     public void update() {
-        if (getUrl() == null) return;
         try {
-            SVNClientManager svnClientManager = SVNClientManager.newInstance(options, username, password);
-            SVNURL svnurl = SVNURL.parseURIEncoded(getUrl());
-
+            SVNClientManager svnClientManager = SVNClientManager.newInstance(options, getConf().getVcsUserName(), getConf().getVcsUserPassword());
+            SVNURL svnurl = SVNURL.parseURIEncoded(getConf().getVcsUri());
             if (!outDir().exists()) {//不存在的目录需要进行检出
                 SVNUpdateClient svnUpdateClient = svnClientManager.getUpdateClient();
                 svnUpdateClient.doCheckout(svnurl, outDir(), SVNRevision.HEAD, SVNRevision.HEAD, SVNDepth.INFINITY, false);
@@ -48,8 +40,7 @@ public class RepositorySvn extends Repository {
 
     @Override
     public void commit() {
-        if (getUrl() == null) return;
-        SVNClientManager svnClientManager = SVNClientManager.newInstance(options, username, password);
+        SVNClientManager svnClientManager = SVNClientManager.newInstance(options, getConf().getVcsUserName(), getConf().getVcsUserPassword());
         checkVersionDirectory(svnClientManager, outDir());
     }
 
@@ -80,10 +71,9 @@ public class RepositorySvn extends Repository {
 
     @Override
     public void upload() {
-        if (getUrl() == null) return;
         try {
             update();
-            SVNClientManager svnClientManager = SVNClientManager.newInstance(options, username, password);
+            SVNClientManager svnClientManager = SVNClientManager.newInstance(options, getConf().getVcsUserName(), getConf().getVcsUserPassword());
             SVNCommitClient svnCommitClient = svnClientManager.getCommitClient();
 
             svnCommitClient.doCommit(

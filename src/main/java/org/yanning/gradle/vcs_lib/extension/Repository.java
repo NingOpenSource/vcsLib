@@ -1,20 +1,22 @@
 package org.yanning.gradle.vcs_lib.extension;
 
-import org.gradle.api.logging.Logging;
-import org.yanning.gradle.vcs_lib.utils.FileUtils;
+import org.yanning.gradle.vcs_lib.core.VCSLibConf;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.Base64;
-import java.util.UUID;
 
 public abstract class Repository {
-
-
-    private String url;
+    private VCSLibConf conf;
     private File outDir;
 
+    public Repository(VCSLibConf conf) {
+        this.conf = conf;
+    }
+
+    public VCSLibConf getConf() {
+        return conf;
+    }
 
     public File outDir() {
         if (outDir == null) {
@@ -26,8 +28,8 @@ public abstract class Repository {
 //                e.printStackTrace();
 //            }
             try {
-                outDir=new File(new File(System.getProperties().getProperty(App.KEY_VCS_LIB_HOME)),
-                        URLEncoder.encode(url, "utf-8"));
+                outDir=new File(conf.getVcsLibHome(),
+                        URLEncoder.encode(conf.getVcsUri(), "utf-8"));
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
@@ -43,18 +45,5 @@ public abstract class Repository {
     public abstract void upload();
 
     public abstract VcsType vcsType();
-
-    public void url(String url){
-        setUrl(url);
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
 
 }

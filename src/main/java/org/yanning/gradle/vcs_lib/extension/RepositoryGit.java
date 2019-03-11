@@ -4,28 +4,17 @@ import jodd.io.FileUtil;
 import org.eclipse.jgit.api.AddCommand;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.TransportConfigCallback;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.api.errors.NoFilepatternException;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.lib.AnyObjectId;
-import org.eclipse.jgit.transport.ChainingCredentialsProvider;
 import org.eclipse.jgit.transport.CredentialsProvider;
-import org.eclipse.jgit.transport.Transport;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
-import org.eclipse.jgit.treewalk.filter.PathFilterGroup;
 import org.gradle.api.logging.Logging;
-import org.gradle.internal.impldep.org.bouncycastle.crypto.params.DSAParameterGenerationParameters;
-import org.tmatesoft.svn.core.SVNDepth;
-import org.tmatesoft.svn.core.SVNException;
-import org.tmatesoft.svn.core.wc.SVNClientManager;
-import org.tmatesoft.svn.core.wc.SVNWCUtil;
-import org.yanning.gradle.vcs_lib.utils.Log;
+import org.yanning.gradle.vcs_lib.core.VCSLibConf;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -33,24 +22,18 @@ import java.util.List;
 
 public class RepositoryGit extends Repository {
     public boolean isUseSSH = false;
-    private String username;
-    private String password;
 
-    public void password(String password) {
-        this.password = password;
-    }
-
-    public void username(String username) {
-        this.username = username;
+    public RepositoryGit(VCSLibConf conf) {
+        super(conf);
     }
 
     private boolean isGitRepository() {
-        if (getUrl() == null) return false;
+        if (getConf()== null) return false;
         return FileUtil.isExistingFolder(new File(outDir(), ".git"));
     }
 
     private CredentialsProvider getCredentialsProvider() {
-        return new UsernamePasswordCredentialsProvider(username, password);
+        return new UsernamePasswordCredentialsProvider(getConf().getVcsUserName(), getConf().getVcsUserPassword());
     }
 
     private Git mGit;
@@ -87,7 +70,7 @@ public class RepositoryGit extends Repository {
 
                             }
                         })
-                        .setURI(getUrl())
+                        .setURI(getConf().getVcsUri())
                         .call();
                 gitCall.onCall(mGit);
             } catch (GitAPIException e) {
@@ -105,7 +88,6 @@ public class RepositoryGit extends Repository {
 
     @Override
     public void update() {
-        if (getUrl() == null) return;
         if (!isGitRepository()) {
             loadGit(git -> {
                 try {
@@ -117,13 +99,12 @@ public class RepositoryGit extends Repository {
                 }
             });
         }
-        Logging.getLogger("vcsLibs").info("update", "from " + getUrl() + " to " + outDir().getPath());
-        System.out.println("vcsLibs:update --> from " + getUrl() + " to " + outDir().getPath());
+        Logging.getLogger("vcsLibs").info("update", "from " + getConf().getVcsUri() + " to " + outDir().getPath());
+        System.out.println("vcsLibs:update --> from " + getConf().getVcsUri()+ " to " + outDir().getPath());
     }
 
     @Override
     public void commit() {
-        if (getUrl() == null) return;
         loadGit(git -> {
             try {
                 List<DiffEntry> diffEntries = git.diff()
@@ -166,7 +147,6 @@ public class RepositoryGit extends Repository {
 
     @Override
     public void upload() {
-        if (getUrl() == null) return;
         loadGit(git -> {
             try {
                 git.push().setTransportConfigCallback(transport -> {

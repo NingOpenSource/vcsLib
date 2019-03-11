@@ -142,7 +142,7 @@ public class App {
             Repository repository = repositoriesTo.getRepositories().get(0);
             String fileScriptName = "vcsLibUpload.gradle";
             if (libSuffix == libSuffix.AAR) {
-                fileScriptName = "vcsLibUpload_android.gradle";
+                fileScriptName = "vcsLibUpload_aar.gradle";
             }
             {
                 File fileScript = new File(project.getProjectDir(), fileScriptName);

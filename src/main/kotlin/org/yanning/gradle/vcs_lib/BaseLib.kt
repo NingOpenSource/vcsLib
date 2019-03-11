@@ -1,6 +1,7 @@
 package org.yanning.gradle.vcs_lib
 
 import org.gradle.api.Project
+import org.yanning.gradle.vcs_lib.core.AppConfig
 import org.yanning.gradle.vcs_lib.core.LibrarySuffix
 import org.yanning.gradle.vcs_lib.extension.App
 import org.yanning.gradle.vcs_lib.task.Build
@@ -8,34 +9,26 @@ import org.yanning.gradle.vcs_lib.task.GUI
 import org.yanning.gradle.vcs_lib.task.Update
 import org.yanning.gradle.vcs_lib.task.Upload
 import org.yanning.gradle.vcs_lib.utils.Log
+import java.io.File
 
 class BaseLib {
     companion object {
 
 
-        const val TASK_vcsLibGUI = "vcsLibGUI"
-        const val TASK_vcsLib = "vcsLib"
-        const val TASK_vcsLibsBuild = "vcsLibBuild"
-        const val TASK_vcsLibsUpdate = "vcsLibUpdate"
-        const val TASK_vcsLibsUpload = "vcsLibUpload"
-
-        fun apply(target: Project?, libSuffix: LibrarySuffix) {
-            target?.pluginManager?.hasPlugin("maven")?.let {
-                if (it) {
-                    target.pluginManager.apply("maven")
+        fun apply(target: Project?) {
+            if (AppConfig.getVCSLibPath().exists()&&AppConfig.getVCSLibPath().listFiles().isNullOrEmpty()) {
+                /**
+                 * 添加仓库地址
+                 */
+                target?.repositories?.maven {
+                    it.url = AppConfig.getVCSLibPath().toURI()
                 }
             }
-            val app = target?.extensions?.create(TASK_vcsLib, App::class.java, target, libSuffix)
-//            target?.getTasksByName("assemble", false)?.iterator()?.next()?.doLast { task ->
-//                //            System.err.println("success.....................")
-//                app?.controller?.doBuild()
-//                app?.controller?.doUpdate()
-//            }
-            target?.tasks?.create(TASK_vcsLibGUI, GUI::class.java)
+            target?.tasks?.create(TaskConf.vcsLibGUI.name, GUI::class.java)
             target?.tasks?.create(TASK_vcsLibsBuild, Build::class.java){
                 it.bindApp(app)
             }
-            target?.tasks?.create(TASK_vcsLibsUpdate, Update::class.java) {
+            target?.tasks?.create(TaskConf.vcsLibUpdate.name, Update::class.java) {
                 it.bindApp(app)
                 it.bindOutDirAction {
                     it.forEach {
