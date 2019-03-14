@@ -10,7 +10,8 @@ import org.eclipse.jgit.lib.AnyObjectId;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.gradle.api.logging.Logging;
-import org.yanning.gradle.vcs_lib.core.VCSLibConf;
+import org.yanning.gradle.vcs_lib.core.Conf;
+import org.yanning.gradle.vcs_lib.core.ConfKey;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,23 +24,28 @@ import java.util.List;
 public class RepositoryGit extends Repository {
     public boolean isUseSSH = false;
 
-    public RepositoryGit(VCSLibConf conf) {
+    public RepositoryGit(Conf conf) {
         super(conf);
     }
 
     private boolean isGitRepository() {
-        if (getConf()== null) return false;
+        if (getConf() == null) return false;
         return FileUtil.isExistingFolder(new File(outDir(), ".git"));
     }
 
     private CredentialsProvider getCredentialsProvider() {
-        return new UsernamePasswordCredentialsProvider(getConf().getVcsUserName(), getConf().getVcsUserPassword());
+        return new UsernamePasswordCredentialsProvider(getConf().getConf(ConfKey.repoUsername), getConf().getConf(ConfKey.repoPassword));
     }
 
     private Git mGit;
 
     private interface GitCall {
         void onCall(Git git);
+    }
+
+    @Override
+    public boolean hasCheckout() {
+        return isGitRepository();
     }
 
     private void loadGit(GitCall gitCall) {
@@ -70,7 +76,7 @@ public class RepositoryGit extends Repository {
 
                             }
                         })
-                        .setURI(getConf().getVcsUri())
+                        .setURI(getConf().getConf(ConfKey.repoUri))
                         .call();
                 gitCall.onCall(mGit);
             } catch (GitAPIException e) {
@@ -99,8 +105,8 @@ public class RepositoryGit extends Repository {
                 }
             });
         }
-        Logging.getLogger("vcsLibs").info("update", "from " + getConf().getVcsUri() + " to " + outDir().getPath());
-        System.out.println("vcsLibs:update --> from " + getConf().getVcsUri()+ " to " + outDir().getPath());
+        Logging.getLogger("vcsLibs").info("update", "from " + getConf().getConf(ConfKey.repoUri) + " to " + outDir().getPath());
+        System.out.println("vcsLibs:update --> from " + getConf().getConf(ConfKey.repoUri) + " to " + outDir().getPath());
     }
 
     @Override

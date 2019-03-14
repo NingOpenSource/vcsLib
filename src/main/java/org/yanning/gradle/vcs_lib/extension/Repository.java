@@ -1,20 +1,21 @@
 package org.yanning.gradle.vcs_lib.extension;
 
-import org.yanning.gradle.vcs_lib.core.VCSLibConf;
+import org.yanning.gradle.vcs_lib.core.Conf;
+import org.yanning.gradle.vcs_lib.core.ConfKey;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 public abstract class Repository {
-    private VCSLibConf conf;
+    private Conf conf;
     private File outDir;
 
-    public Repository(VCSLibConf conf) {
+    Repository(Conf conf) {
         this.conf = conf;
     }
 
-    public VCSLibConf getConf() {
+    Conf getConf() {
         return conf;
     }
 
@@ -28,8 +29,8 @@ public abstract class Repository {
 //                e.printStackTrace();
 //            }
             try {
-                outDir=new File(conf.getVcsLibHome(),
-                        URLEncoder.encode(conf.getVcsUri(), "utf-8"));
+                outDir = new File(new File(conf.getConf(ConfKey.vcsLibHome)),
+                        URLEncoder.encode(conf.getConf(ConfKey.repoUri), "utf-8"));
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
@@ -37,6 +38,7 @@ public abstract class Repository {
         return outDir;
     }
 
+    public abstract boolean hasCheckout();
 
     public abstract void update();
 

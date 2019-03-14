@@ -1,12 +1,12 @@
 package org.yanning.gradle.vcs_lib.extension;
 
-import org.gradle.api.logging.Logging;
 import org.tmatesoft.svn.core.SVNDepth;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.internal.wc.DefaultSVNOptions;
 import org.tmatesoft.svn.core.wc.*;
-import org.yanning.gradle.vcs_lib.core.VCSLibConf;
+import org.yanning.gradle.vcs_lib.core.Conf;
+import org.yanning.gradle.vcs_lib.core.ConfKey;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -15,15 +15,20 @@ import java.util.Date;
 public class RepositorySvn extends Repository {
     private DefaultSVNOptions options = SVNWCUtil.createDefaultOptions(true);
 
-    public RepositorySvn(VCSLibConf conf) {
+    public RepositorySvn(Conf conf) {
         super(conf);
+    }
+
+    @Override
+    public boolean hasCheckout() {
+        return outDir().exists()&&new File(outDir(),".svn").exists();
     }
 
     @Override
     public void update() {
         try {
-            SVNClientManager svnClientManager = SVNClientManager.newInstance(options, getConf().getVcsUserName(), getConf().getVcsUserPassword());
-            SVNURL svnurl = SVNURL.parseURIEncoded(getConf().getVcsUri());
+            SVNClientManager svnClientManager = SVNClientManager.newInstance(options, getConf().getConf(ConfKey.repoUsername), getConf().getConf(ConfKey.repoPassword));
+            SVNURL svnurl = SVNURL.parseURIEncoded(getConf().getConf(ConfKey.repoUri));
             if (!outDir().exists()) {//不存在的目录需要进行检出
                 SVNUpdateClient svnUpdateClient = svnClientManager.getUpdateClient();
                 svnUpdateClient.doCheckout(svnurl, outDir(), SVNRevision.HEAD, SVNRevision.HEAD, SVNDepth.INFINITY, false);
@@ -40,7 +45,7 @@ public class RepositorySvn extends Repository {
 
     @Override
     public void commit() {
-        SVNClientManager svnClientManager = SVNClientManager.newInstance(options, getConf().getVcsUserName(), getConf().getVcsUserPassword());
+        SVNClientManager svnClientManager = SVNClientManager.newInstance(options, getConf().getConf(ConfKey.repoUsername), getConf().getConf(ConfKey.repoPassword));
         checkVersionDirectory(svnClientManager, outDir());
     }
 
@@ -73,7 +78,7 @@ public class RepositorySvn extends Repository {
     public void upload() {
         try {
             update();
-            SVNClientManager svnClientManager = SVNClientManager.newInstance(options, getConf().getVcsUserName(), getConf().getVcsUserPassword());
+            SVNClientManager svnClientManager = SVNClientManager.newInstance(options, getConf().getConf(ConfKey.repoUsername), getConf().getConf(ConfKey.repoPassword));
             SVNCommitClient svnCommitClient = svnClientManager.getCommitClient();
 
             svnCommitClient.doCommit(

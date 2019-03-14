@@ -9,12 +9,12 @@ public class GUI extends DefaultTask {
 
     @TaskAction
     public void launchGui(){
-        new Thread(){
-            @Override
-            public void run() {
-                super.run();
-                App.launch(CustomApplication.class);
-            }
-        }.start();
+//        new Thread(){
+//            @Override
+//            public void run() {
+//                super.run();
+//                App.launch(CustomApplication.class);
+//            }
+//        }.start();
     }
 }

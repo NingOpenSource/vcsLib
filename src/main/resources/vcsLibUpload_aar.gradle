@@ -2,9 +2,9 @@ if (pluginManager.findPlugin("maven") == null) {
     apply plugin: 'maven'
 }
 
-group "$VCS_LIB_GROUP_ID"
+group vcsLib_mavenGroupId
 //name "$VCS_LIB_ARTIFACT_ID"
-version "$VCS_LIB_VERSION"
+version vcsLib_mavenVersionName
 
 
 task androidJavadocs(type: Javadoc) {
@@ -32,7 +32,7 @@ artifacts {
 uploadArchives {
     repositories {
         mavenDeployer {
-            repository(url: uri("$VCS_LIB_HOME"))
+            repository(url: uri(vcsLib_vcsLibHome))
         }
     }
 }

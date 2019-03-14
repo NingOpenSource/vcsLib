@@ -123,7 +123,7 @@ class ConsoleView(
         uploadGroupId.addListener(ChangeListener { _, _, _ -> renderUploadVersionUsage() })
         uploadArtifactId.addListener(ChangeListener { _, _, _ -> renderUploadVersionUsage() })
         uploadVersion.addListener(ChangeListener { _, _, _ -> renderUploadVersionUsage() })
-        repositoriesOutPath.set(AppConfig.getDefaultVCSLibPath().absolutePath)
+        repositoriesOutPath.set(""/*,AppConfig.getDefaultVCSLibPath().absolutePath*/)
         uploadLibrarySuffix.set(LibrarySuffix.JAR)
         demo()
     }
