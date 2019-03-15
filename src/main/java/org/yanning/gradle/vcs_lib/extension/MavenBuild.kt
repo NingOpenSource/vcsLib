@@ -18,27 +18,39 @@ class MavenBuild(
         private val libSuffix: LibrarySuffix) {
 
     fun build() {
-        val appConfig = AppConfig(target)
-        if (appConfig.isRootProject()) return
-        val conf = appConfig.conf
-        val repo = RepositoryBuilder(conf).build() ?: return
-        val fileScriptName: String
-        if (libSuffix === LibrarySuffix.AAR) {
-            fileScriptName = "vcsLibUpload_aar.gradle"
-        } else if (libSuffix === LibrarySuffix.JAR) {
-            fileScriptName = "vcsLibUpload_jar.gradle"
-        } else {
-            fileScriptName = "vcsLibUpload_jar.gradle"
-        }
+        try {
+            val appConfig = AppConfig(target)
+            if (appConfig.isRootProject()) return
+            val conf = appConfig.conf
+            val repo = RepositoryBuilder(conf).build() ?: return
+            val fileScriptName: String
+            if (libSuffix === LibrarySuffix.AAR) {
+                fileScriptName = "vcsLibUpload_aar.gradle"
+            } else if (libSuffix === LibrarySuffix.JAR) {
+                fileScriptName = "vcsLibUpload_jar.gradle"
+            } else {
+                fileScriptName = "vcsLibUpload_jar.gradle"
+            }
 //            val fileScript = File(target.projectDir, fileScriptName)
-        target.extensions.add(ConfKey.vcsLibHome.displyName(),File(conf.getConf(ConfKey.vcsLibHome)).toURI().toString())
-        target.extensions.add(ConfKey.mavenGroupId.displyName(),conf.getConf(ConfKey.mavenGroupId))
-        target.extensions.add(ConfKey.mavenArtifactId.displyName(),conf.getConf(ConfKey.mavenArtifactId))
-        target.extensions.add(ConfKey.mavenVersionName.displyName(),conf.getConf(ConfKey.mavenVersionName))
-        target.apply { objectConfigurationAction -> objectConfigurationAction.from(javaClass.getResource(fileScriptName).toURI()) }
-
-        target.tasks.create(TaskConf.vcsLibUpload.name) {
-            //读取配置文件，链接到当前编译过程
+            target.extensions.add(ConfKey.vcsLibHome.displyName(), File(conf.getConf(ConfKey.vcsLibHome)).toURI().toString())
+            target.extensions.add(ConfKey.mavenGroupId.displyName(), conf.getConf(ConfKey.mavenGroupId))
+            target.extensions.add(ConfKey.mavenArtifactId.displyName(), conf.getConf(ConfKey.mavenArtifactId))
+            target.extensions.add(ConfKey.mavenVersionName.displyName(), conf.getConf(ConfKey.mavenVersionName))
+            val fileScript = File(target.buildDir, fileScriptName)
+            if (!fileScript.exists()) {
+                try {
+                    FileUtil.writeString(
+                            fileScript,
+                            FileUtil.readUTFString(javaClass.getResourceAsStream("/$fileScriptName"))
+                    )
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
+            }
+            Log.err("apply from ${fileScript.absolutePath}->")
+            target.apply { objectConfigurationAction -> objectConfigurationAction.from(fileScript) }
+            target.tasks.create(TaskConf.vcsLibUpload.name) {
+                //读取配置文件，链接到当前编译过程
 //
 //
 //            try {
@@ -54,18 +66,24 @@ class MavenBuild(
 //            } catch (e: IOException) {
 //                e.printStackTrace()
 //            }
-            //上传成功，开始同步vcs仓库
-            Log.out("start update...")
-            repo.update()
-            Log.out("start commit...")
-            repo.commit()
-            Log.out("complete commit. ")
-            Log.out("start upload..." + " [from " + repo.outDir() + " to " + conf.getConf(ConfKey.repoUri) + "]")
-            repo.upload()
-            Log.out("complete doUpload.")
+                //上传成功，开始同步vcs仓库
+                Log.out("start update...")
+                repo.update()
+                Log.out("start commit...")
+                repo.commit()
+                Log.out("complete commit. ")
+                Log.out("start upload..." + " [from " + repo.outDir() + " to " + conf.getConf(ConfKey.repoUri) + "]")
+                repo.upload()
+                Log.out("complete doUpload.")
+            }
+                    .dependsOn(target.tasks.findByName(TaskConf.vcsLibUpdate.name))
+                    //执行上传到vcs目录的命令
+                    .dependsOn(target.tasks.findByName("uploadArchives"))
+
+
+        } catch (e: Exception) {
+            Log.err(e.localizedMessage)
+            e.printStackTrace()
         }
-                .dependsOn(target.tasks.findByName(TaskConf.vcsLibUpdate.name))
-                //执行上传到vcs目录的命令
-                .dependsOn(target.tasks.findByName("uploadArchives"))
     }
 }
