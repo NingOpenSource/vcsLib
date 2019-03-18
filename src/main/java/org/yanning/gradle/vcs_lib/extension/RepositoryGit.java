@@ -117,7 +117,8 @@ public class RepositoryGit extends Repository {
 //                        .setPathFilter(PathFilterGroup.createFromStrings(outDir().getPath()))
                         .setShowNameAndStatusOnly(true).call();
                 if (diffEntries == null || diffEntries.size() == 0) {
-                    throw new RuntimeException("提交的文件内容都没有被修改，不能提交");
+//                    throw new RuntimeException("提交的文件内容都没有被修改，不能提交");
+                    return;
                 }
                 //被修改过的文件
                 List<String> updateFiles = new ArrayList<String>();

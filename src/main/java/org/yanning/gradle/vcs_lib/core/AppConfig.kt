@@ -15,23 +15,44 @@ class AppConfig(private val target: Project) {
     }
 
     val conf: Conf
+
     init {
-        if (isRootProject()) {
-            conf = Conf(File(target.rootDir, confFileName))
-            conf.setConf(ConfKey.vcsLibHome, vcsLibHome.absolutePath)
-            if (conf.getConf(ConfKey.repoUri).isEmpty()) {
-                conf.resetRepoConf().apply()
-            }
+        val file = if (isRootProject()) {
+            File(target.rootDir, confFileName)
         } else {
-            conf = Conf(File(target.projectDir, confFileName))
-            conf.setConf(ConfKey.vcsLibHome, vcsLibHome.absolutePath)
-            if (conf.getConf(ConfKey.repoUri).isEmpty()) {
-                conf.resetRepoConf()
+            File(target.projectDir, confFileName)
+        }
+        val isNeedReset = !file.exists() || file.length() == 0.toLong()
+        conf = Conf(file)
+        if (isNeedReset) {
+            if (isRootProject()) {
+//                if (conf.getConf(ConfKey.repoUri).isEmpty()
+//                        && vcsLibHome.absolutePath != conf.getConf(ConfKey.vcsLibHome)
+//                        && conf.getConf(ConfKey.repoUsername).isEmpty()
+//                        && conf.getConf(ConfKey.repoPassword).isEmpty()
+//                        && conf.getConf(ConfKey.repoType).isEmpty())
+                conf.resetBaseConf().apply()
+            } else {
+//                var b_0 = false
+//                var b_1 = false
+//                if (conf.getConf(ConfKey.repoUri).isEmpty()
+//                        && vcsLibHome.absolutePath != conf.getConf(ConfKey.vcsLibHome)
+//                        && conf.getConf(ConfKey.repoUsername).isEmpty()
+//                        && conf.getConf(ConfKey.repoPassword).isEmpty()
+//                        && conf.getConf(ConfKey.repoType).isEmpty()) {
+//                    conf.resetBaseConf()
+//                    b_0 = true
+//                }
+//                if (conf.getConf(ConfKey.mavenGroupId).isEmpty()
+//                        && conf.getConf(ConfKey.mavenArtifactId).isEmpty()
+//                        && conf.getConf(ConfKey.mavenVersionName).isEmpty()) {
+//                    conf.resetMavenConf()
+//                    b_1 = true
+//                }
+//                if (b_0 || b_1)
+//                    conf.apply()
+                conf.resetBaseConf().resetMavenConf().apply()
             }
-            if (conf.getConf(ConfKey.mavenGroupId).isEmpty()) {
-                conf.resetMavenConf()
-            }
-            conf.apply()
         }
     }
 

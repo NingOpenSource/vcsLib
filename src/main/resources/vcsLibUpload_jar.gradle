@@ -1,3 +1,7 @@
+System.out.println("----------------vcsLib_mavenGroupId:$vcsLib_mavenGroupId")
+System.out.println("----------------vcsLib_mavenGroupId:$vcsLib_mavenVersionName")
+System.out.println("----------------vcsLib_mavenGroupId:$vcsLib_vcsLibHome")
+
 if (pluginManager.findPlugin("maven") == null) {
     apply plugin: 'maven'
 }

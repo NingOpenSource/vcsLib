@@ -15,7 +15,7 @@ buildscript {
 
 
 group 'org.yanning.gradle'
-version '1.1.43'
+version '1.1.56'
 
 apply plugin: 'java'
 apply plugin: 'java-library'
@@ -83,6 +83,7 @@ dependencies {
     implementation 'org.eclipse.jgit:org.eclipse.jgit:+'
     implementation 'org.tmatesoft.svnkit:svnkit:+'
     implementation 'org.jodd:jodd-core:+'
+    implementation 'org.jodd:jodd-props:+'
 //    implementation 'com.google.code.gson:gson:2.8.4'
     implementation('no.tornado:tornadofx:1.7.17')
 }
