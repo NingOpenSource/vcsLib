@@ -86,6 +86,7 @@ dependencies {
     implementation 'org.jodd:jodd-props:+'
 //    implementation 'com.google.code.gson:gson:2.8.4'
     implementation('no.tornado:tornadofx:1.7.17')
+    implementation('org.openjfx:javafx:12')
 }
 
 compileKotlin {

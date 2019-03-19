@@ -23,32 +23,32 @@ https://github.com/zacker330/jshint-gradle
 
 1. config step 1>>`$rootDir/build.gradle`:
     ```gradle
-            buildscript {
-                repositories {
-                    jcenter()  //required
-                }
-                dependencies {
-                    classpath "org.yanning.gradle:vcsLib:+"  //lastest version
-                }
-            }
+    buildscript {
+        repositories {
+            jcenter()  //required
+        }
+        dependencies {
+            classpath "org.yanning.gradle:vcsLib:+"  //lastest version
+        }
+    }
     ```
     or
     ```gradle
-            buildscript {
-                repositories {
-                    jcenter()  //required
-                    maven { url 'https://jitpack.io' }  //required
-                }
-                dependencies {
-                    classpath 'com.github.NingOpenSource:vcsLib:+'  //lastest version
-                }
-            }
+    buildscript {
+        repositories {
+            jcenter()  //required
+            maven { url 'https://jitpack.io' }  //required
+        }
+        dependencies {
+            classpath 'com.github.NingOpenSource:vcsLib:+'  //lastest version
+        }
+    }
     ```        
 
 1. config step 2>>`$projectDir/build.gradle`:
     
     ```gradle
-            apply plugin: 'vcsLib'
+    apply plugin: 'vcsLib'
     ```
 1. config file 'vcsLib.properties'
     ```properties

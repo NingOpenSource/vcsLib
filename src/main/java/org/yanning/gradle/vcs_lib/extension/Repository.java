@@ -1,5 +1,6 @@
 package org.yanning.gradle.vcs_lib.extension;
 
+import org.yanning.gradle.vcs_lib.core.AppConfig;
 import org.yanning.gradle.vcs_lib.core.Conf;
 import org.yanning.gradle.vcs_lib.core.ConfKey;
 
@@ -29,7 +30,7 @@ public abstract class Repository {
 //                e.printStackTrace();
 //            }
             try {
-                outDir = new File(new File(conf.getConf(ConfKey.vcsLibHome)),
+                outDir = new File(new File(conf.getConf(ConfKey.vcsLibHome, AppConfig.Companion.getVcsLibHome().getAbsolutePath())),
                         URLEncoder.encode(conf.getConf(ConfKey.repoUri), "utf-8"));
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();

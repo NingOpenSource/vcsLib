@@ -8,6 +8,7 @@ import org.yanning.gradle.vcs_lib.core.ConfKey
 import org.yanning.gradle.vcs_lib.core.LibrarySuffix
 import org.yanning.gradle.vcs_lib.extension.RepositoryBuilder
 import org.yanning.gradle.vcs_lib.task.GUI
+import org.yanning.gradle.vcs_lib.task.GUITask
 import org.yanning.gradle.vcs_lib.task.UpdateTask
 import org.yanning.gradle.vcs_lib.task.UploadTask
 import org.yanning.gradle.vcs_lib.utils.Log
@@ -30,6 +31,14 @@ class vcsLib : Plugin<Project> {
                     it.name = "vcsLib-${target.name}"
                     it.url = repo.outDir().toURI()
                 })
+
+
+        if (target.tasks.findByName(TaskConf.vcsLibGUI.name) == null) {
+            /**
+             * 创建GUI命令
+             */
+            target.tasks.register(TaskConf.vcsLibGUI.name, GUITask::class.java,target)
+        }
 
         if (true.toString() == config.getConf(ConfKey.isUseUploadMaven)) {
             /**
@@ -86,11 +95,5 @@ class vcsLib : Plugin<Project> {
 
         }
 
-        if (target.tasks.findByName(TaskConf.vcsLibGUI.name) == null) {
-            /**
-             * 创建GUI命令
-             */
-            target.tasks.register(TaskConf.vcsLibGUI.name, GUI::class.java)
-        }
     }
 }

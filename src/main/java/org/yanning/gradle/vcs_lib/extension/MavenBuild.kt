@@ -32,7 +32,7 @@ class MavenBuild(
                 fileScriptName = "vcsLibUpload_jar.gradle"
             }
 //            val fileScript = File(target.projectDir, fileScriptName)
-            target.extensions.add(ConfKey.vcsLibHome.displyName(), File(conf.getConf(ConfKey.vcsLibHome)).toURI().toString())
+            target.extensions.add(ConfKey.vcsLibHome.displyName(), File(conf.getConf(ConfKey.vcsLibHome,AppConfig.vcsLibHome.absolutePath)).toURI().toString())
             target.extensions.add(ConfKey.mavenGroupId.displyName(), conf.getConf(ConfKey.mavenGroupId))
             target.extensions.add(ConfKey.mavenArtifactId.displyName(), conf.getConf(ConfKey.mavenArtifactId))
             target.extensions.add(ConfKey.mavenVersionName.displyName(), conf.getConf(ConfKey.mavenVersionName))

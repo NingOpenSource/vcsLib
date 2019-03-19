@@ -34,8 +34,13 @@ class Conf(
     }
 
     fun getConf(confKey: ConfKey): String {
+        return getConf(confKey, "")
+    }
+
+    fun getConf(confKey: ConfKey, defaultValue: String): String {
         Log.out("getConf:$confKey")
-        return props.getProperty(confKey.name) ?: return ""
+        if (props.getProperty(confKey.name).isNullOrEmpty()) return defaultValue
+        return props.getProperty(confKey.name)
     }
 
     fun apply() {
@@ -57,12 +62,12 @@ class Conf(
     }
 
     fun resetBaseConf(): Conf {
-        props.setPropertyWithComment(ConfKey.vcsLibHome.name, AppConfig.vcsLibHome.absolutePath, "vcsLibs home dir")
+        props.setPropertyWithComment(ConfKey.vcsLibHome.name, "", "nullable, vcsLibs home dir,default is [USER_HOME]/.vcsLib")
         props.setPropertyWithComment(ConfKey.repoUri.name, "", "")
         props.setPropertyWithComment(ConfKey.repoType.name, "", "svn/git")
         props.setPropertyWithComment(ConfKey.repoUsername.name, "", "nullable")
         props.setPropertyWithComment(ConfKey.repoPassword.name, "", "nullable")
-        props.setPropertyWithComment(ConfKey.isAutoUpdateRepoOnBuild.name,false.toString(),"true/false,default is false")
+        props.setPropertyWithComment(ConfKey.isAutoUpdateRepoOnBuild.name, false.toString(), "true/false,default is false")
         return this
     }
 
