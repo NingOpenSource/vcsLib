@@ -20,124 +20,105 @@ https://www.jianshu.com/p/944bb00355e2
 
 https://github.com/zacker330/jshint-gradle
 ### How to use?
-1. config file 'vcsLib.properties'
-```properties
-#update on 2019-03-18 15:10:49
-## Demo:
-## vcsLib_repoUri:https\://github.com/demo/demo.git
-## vcsLib_repoType:svn/git
-## vcsLib_repoUsername:Nullable
-## vcsLib_repoPassword:Nullable
-## vcsLib_isAutoUpdateRepoOnBuild:true/false (default is false)
-## vcsLib_isUseUploadMaven:true/false (default is false)
-## if(!vcsLib_isUseUploadMaven) return
-## vcsLib_mavenUploadType:jar/aar
-## vcsLib_mavenGroupId:org.demo
-## vcsLib_mavenArtifactId:demo123
-## vcsLib_mavenVersionName:1.2.3
-#Mon Mar 18 15:10:49 CST 2019
-
-#vcsLibs home dir
-vcsLibHome=C\:\\Users\\Administrator\\.vcsLib
-
-repoUri=https\://gitee.com/VarietyShop/vcsLibDemo.git
-
-#svn/git
-repoType=git
-
-#nullable
-repoUsername=123456@demo.com
-
-#nullable
-repoPassword=123456
-
-#true/false,default is false
-isAutoUpdateRepoOnBuild=false
-
-#true/false,default is false
-isUseUploadMaven=true
-
-#jar/aar,default is jar
-mavenUploadType=aar
-
-mavenGroupId=org.demo
-
-mavenArtifactId=demo123
-
-mavenVersionName=1.2.3
-
-
-```
 
 1. config step 1>>`$rootDir/build.gradle`:
-```gradle
-        buildscript {
-            repositories {
-                jcenter()  //required
+    ```gradle
+            buildscript {
+                repositories {
+                    jcenter()  //required
+                }
+                dependencies {
+                    classpath "org.yanning.gradle:vcsLib:+"  //lastest version
+                }
             }
-            dependencies {
-                classpath "org.yanning.gradle:vcsLib:+"  //lastest version
+    ```
+    or
+    ```gradle
+            buildscript {
+                repositories {
+                    jcenter()  //required
+                    maven { url 'https://jitpack.io' }  //required
+                }
+                dependencies {
+                    classpath 'com.github.NingOpenSource:vcsLib:+'  //lastest version
+                }
             }
-        }
-```
-**or** 
-```gradle
-        buildscript {
-            repositories {
-                jcenter()  //required
-                maven { url 'https://jitpack.io' }  //required
-            }
-            dependencies {
-                classpath 'com.github.NingOpenSource:vcsLib:+'  //lastest version
-            }
-        }
-```        
+    ```        
 
-2. config step 2>>`$projectDir/build.gradle`:
+1. config step 2>>`$projectDir/build.gradle`:
     
-Android:
-```gradle
-        apply plugin: 'vcsLib_android'
-```
-Java:    
-```gradle
-        apply plugin: 'vcsLib'
-```
-Then: 
-```gradle
-        vcsLib{
-            from{   // add a vcs repository
-                vcs "svn://192.168.0.1/android/.vcsLibs", "username", "password" //config svn or git repository
-            }
-            to{     //config maven, publish java or android library to vcs repository
-                groupId "com.github.NingOpenSource"
-                artifactId 'LogFormat'
-                version "0.0.3"
-                vcs "svn://192.168.0.1/android/.vcsLibs", "username", "password" //config svn or git repository
-            }
-        }
-```   
+    ```gradle
+            apply plugin: 'vcsLib'
+    ```
+1. config file 'vcsLib.properties'
+    ```properties
+    #update on 2019-03-18 15:10:49
+    ## Demo:
+    ## vcsLib_repoUri:https\://github.com/demo/demo.git
+    ## vcsLib_repoType:svn/git
+    ## vcsLib_repoUsername:Nullable
+    ## vcsLib_repoPassword:Nullable
+    ## vcsLib_isAutoUpdateRepoOnBuild:true/false (default is false)
+    ## vcsLib_isUseUploadMaven:true/false (default is false)
+    ## if(!vcsLib_isUseUploadMaven) return
+    ## vcsLib_mavenUploadType:jar/aar
+    ## vcsLib_mavenGroupId:org.demo
+    ## vcsLib_mavenArtifactId:demo123
+    ## vcsLib_mavenVersionName:1.2.3
+    #Mon Mar 18 15:10:49 CST 2019
+    
+    #vcsLibs home dir
+    vcsLibHome=C\:\\Users\\Administrator\\.vcsLib
+    
+    repoUri=https\://gitee.com/VarietyShop/vcsLibDemo.git
+    
+    #svn/git
+    repoType=git
+    
+    #nullable
+    repoUsername=123456@demo.com
+    
+    #nullable
+    repoPassword=123456
+    
+    #true/false,default is false
+    isAutoUpdateRepoOnBuild=false
+    
+    #true/false,default is false
+    isUseUploadMaven=true
+    
+    #jar/aar,default is jar
+    mavenUploadType=aar
+    
+    mavenGroupId=org.demo
+    
+    mavenArtifactId=demo123
+    
+    mavenVersionName=1.2.3
+    
+    ```
+ 
         
-3. publish java or android library to vcs repository
+1. publish java or android library to vcs repository
     
-**CMD**：
-```gradle    
-        gradle :[module_name]:vcsLibUpload
-```
-**IDE**：
-    
-![](./pic/20180319110507.png)
+    CMD：
+    ```gradle    
+            gradle :[module_name]:vcsLibUpload
+    ```
+    IDE：
         
-4. dependencies
-```gradle        
-        dependencies {
-            compile 'com.github.NingOpenSource:LogFormat:0.0.3'
-        }
-```
+    ![](./pic/20180319110507.png)
+        
+1. dependencies
+    ```gradle        
+    dependencies {
+        compile 'com.github.NingOpenSource:LogFormat:0.0.3'
+    }
+    ```
 
 ### upload to jcenter:
 
-**CMD**
+CMD
 ```gradle    
-        gradle clean build install generatePomFileForMavenPublication bintrayUpload -PbintrayUser=[username] -PbintrayKey=[userkey] -PdryRun=false
+gradle clean build install generatePomFileForMavenPublication bintrayUpload -PbintrayUser=[username] -PbintrayKey=[userkey] -PdryRun=false
 ```        
