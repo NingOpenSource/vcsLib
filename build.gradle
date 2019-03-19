@@ -15,7 +15,7 @@ buildscript {
 
 
 group 'org.yanning.gradle'
-version '1.1.56'
+version '2.0.2'
 
 apply plugin: 'java'
 apply plugin: 'java-library'
@@ -85,7 +85,9 @@ dependencies {
     implementation 'org.jodd:jodd-core:+'
     implementation 'org.jodd:jodd-props:+'
 //    implementation 'com.google.code.gson:gson:2.8.4'
-    implementation('no.tornado:tornadofx:1.7.17')
+    implementation('no.tornado:tornadofx:1.7.17'){
+        exclude group: 'org.jetbrains.kotlin'
+    }
 //    implementation('org.openjfx:javafx:12')
 }
 
