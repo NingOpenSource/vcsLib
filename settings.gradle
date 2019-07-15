@@ -1,4 +1,4 @@
-rootProject.name = 'vcsLib'
-//include ':vcsLib-GUI'
+//rootProject.name = 'vcsLib'
+include ':plugin-gradle',':gui'
 //include 'lib_vcs_demo'
 
