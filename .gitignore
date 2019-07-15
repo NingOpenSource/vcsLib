@@ -4,4 +4,5 @@
 build/
 out/
 publish.bat
+*.iml
 
