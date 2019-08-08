@@ -1,4 +1,4 @@
-apply from:'../mavenDeployer.gradle'
+apply from:'https://raw.githubusercontent.com/NingOpenSource/vcsLib/master/doc/mavenDeployer_v0.0.1.gradle'
 
 vcsMavenDeployer(
         "org.yanning.gradle.vcs_lib_test",
