@@ -1,0 +1,46 @@
+
+apply plugin: 'maven'
+
+
+
+group 'org.yanning.gradle.vcs_lib_test'
+version '0.0.1'
+task sourcesJar(type: Jar) {
+    from sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+if (tasks.findByName('javadoc') == null)
+    task javadoc(type: Javadoc) {
+        options.encoding = "UTF-8"
+        source = sourceSets.main.java.srcDirs
+        classpath += project.files(getBootClasspath().join(File.pathSeparator))
+    }
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+tasks.withType(Javadoc) {
+    options.addStringOption('Xdoclint:none', '-quiet')
+    options.addStringOption('encoding', 'UTF-8')
+    options.addStringOption('charSet', 'UTF-8')
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            def outDir = new File("${rootDir.absolutePath}${File.separator}doc${File.separator}maven")
+            println("output:${outDir.absolutePath}")
+            repository(url: outDir.toURI())
+        }
+    }
+}
+
+

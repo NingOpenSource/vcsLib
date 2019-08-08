@@ -1,0 +1,23 @@
+//rootProject.ext.vcsMaven = {vcsLibHome=new File(System.getProperty("user.home"), ".vcsLib").absolutePath,vcsUri->
+//        println("vcsLibHome:$vcsLibHome")
+//    }
+/**
+ * import maven by vcsLib
+ *
+ * @param vcsLibHome local maven's dir
+ * @param vcsUri vcs uri
+ */
+def MavenArtifactRepository vcsMaven1(String vcsLibHome = new File(System.getProperty("user.home"), ".vcsLib").absolutePath, String vcsUri) {
+    println("==========================" + new File(new File(vcsLibHome), URLEncoder.encode(vcsUri, "utf-8")).toURI())
+
+    return repositories.maven {
+        url(new File(new File(vcsLibHome), URLEncoder.encode(vcsUri, "utf-8")).toURI())
+    }
+}
+
+
+//repositories {
+//    vcsMaven("https://gitee.com/mirrors/Vugu.git")
+//}
+
+

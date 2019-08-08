@@ -1,0 +1,4 @@
+//rootProject.name = 'vcsLib'
+include ':demo'
+//include 'lib_vcs_demo'
+

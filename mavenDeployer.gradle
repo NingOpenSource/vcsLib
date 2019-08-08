@@ -1,0 +1,65 @@
+project.ext.vcsMavenDeployer = { String mGroup,
+                                 String mArtifactId,
+                                 String mVersion,
+                                 String vcsUri,
+                                 String vcsLibHome = new File(System.getProperty("user.home"), ".vcsLib").absolutePath ->
+    println("vcsLibHome:$vcsLibHome")
+    boolean isAndroidLibrary = plugins.hasPlugin('com.android.library')
+    if (!plugins.hasPlugin('maven'))
+        apply plugin: 'maven'
+    group mGroup
+    version mVersion
+
+
+    Set<File> srcFiles = isAndroidLibrary ? android.sourceSets.main.java.srcDirs : sourceSets.main.java.srcDirs
+
+    if (tasks.findByName('sourcesJar') == null)
+        task sourcesJar(type: Jar) {
+            from srcFiles
+            classifier = 'sources'
+        }
+
+    if (tasks.findByName('javadoc') == null)
+        task javadoc(type: Javadoc) {
+            options.encoding = "UTF-8"
+            source = srcFiles
+            if (isAndroidLibrary) {
+                classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+            } else {
+                classpath += project.files(getBootClasspath().join(File.pathSeparator))
+            }
+        }
+    if (tasks.findByName('javadocJar') == null)
+        task javadocJar(type: Jar, dependsOn: javadoc) {
+            classifier = 'javadoc'
+            from javadoc.destinationDir
+        }
+
+    artifacts {
+        archives javadocJar
+        archives sourcesJar
+    }
+
+
+    tasks.withType(Javadoc) {
+        options.addStringOption('Xdoclint:none', '-quiet')
+        options.addStringOption('encoding', 'UTF-8')
+        options.addStringOption('charSet', 'UTF-8')
+    }
+
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                repository(url: new File(new File(vcsLibHome), URLEncoder.encode(vcsUri, "utf-8")).toURI())
+            }
+        }
+    }
+}
+
+
+
+
+
+
+
+

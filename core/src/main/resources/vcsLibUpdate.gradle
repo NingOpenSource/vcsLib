@@ -1,0 +1,6 @@
+allprojects {
+    repositories {
+//    repository(url: uri("$lib_home"))
+        $repositories
+    }
+}

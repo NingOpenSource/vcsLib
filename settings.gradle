@@ -1,4 +1,6 @@
 //rootProject.name = 'vcsLib'
-include ':plugin-gradle',':gui'
+include ':plugin-gradle',':gui',':terminal'
 //include 'lib_vcs_demo'
+//includeBuild("doc/vcsLibScript.gradle")
 
+//includeBuild("./buildSrcTemp")

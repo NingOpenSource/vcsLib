@@ -1,25 +1,17 @@
-group 'org.yanning.gradle'
-version '2.0.2'
 
 apply plugin: 'java'
 apply plugin: 'java-library'
 apply plugin: 'kotlin'
 
-
-sourceCompatibility = 1.8
-
-repositories {
-    mavenCentral()
-}
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    implementation gradleApi()
     implementation 'org.eclipse.jgit:org.eclipse.jgit:+'
     implementation 'org.tmatesoft.svnkit:svnkit:+'
     implementation 'org.jodd:jodd-core:+'
     implementation 'org.jodd:jodd-props:+'
 //    implementation 'com.google.code.gson:gson:2.8.4'
+    implementation 'com.github.NingOpenSource:LogFormat:0.0.3'
 }
 
 compileKotlin {
@@ -27,12 +19,4 @@ compileKotlin {
 }
 compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
-}
-
-def isDebug=true
-if (isDebug){
-//    apply from:"build_debug.gradle"
-    apply from:"build_test.gradle"
-}else {
-    apply from:"build_release.gradle"
 }

@@ -1,23 +1,40 @@
 package org.yanning.gradle.vcs_lib
 
+import groovy.ui.Console
 import jodd.io.FileUtil
+import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
+import org.gradle.api.initialization.Settings
+import org.gradle.api.logging.LogLevel
+import org.gradle.api.plugins.ExtensionContainer
+import org.gradle.api.plugins.MavenPlugin
+import org.gradle.internal.impldep.aQute.bnd.plugin.git.GitPlugin
+import org.gradle.internal.impldep.org.eclipse.jgit.api.Git
+import org.gradle.wrapper.Logger
 import org.yanning.gradle.vcs_lib.core.AppConfig
 import org.yanning.gradle.vcs_lib.core.ConfKey
 import org.yanning.gradle.vcs_lib.core.LibrarySuffix
 import org.yanning.gradle.vcs_lib.extension.RepositoryBuilder
-import org.yanning.gradle.vcs_lib.task.GUI
-import org.yanning.gradle.vcs_lib.task.GUITask
-import org.yanning.gradle.vcs_lib.task.UpdateTask
-import org.yanning.gradle.vcs_lib.task.UploadTask
+import org.yanning.gradle.vcs_lib.task.*
 import org.yanning.gradle.vcs_lib.utils.Log
 import java.io.File
 import java.io.IOException
+import java.util.*
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 class vcsLib : Plugin<Project> {
 
     override fun apply(target: Project) {
+        target._apply {
+            tasks.create("vcsTest",TestTask::class.java)
+//            task("vcsTest",TestTask::class.java)
+        }
+        if (true){
+            return
+        }
         val appConfig = AppConfig(target)
         val config = appConfig.conf
         if (config.getConf(ConfKey.repoUri).isEmpty()) return
@@ -94,6 +111,30 @@ class vcsLib : Plugin<Project> {
             }
 
         }
+        target._apply {
+            apply {
+                it._apply {
+//                    from("")
+                    plugin(MavenPlugin::class.java)
+                }
+            }
 
+            tasks.create("")._apply {
+
+            }
+
+            Git.open(File(""))
+
+            dependencies._apply {
+                add("implementation",create(""))
+            }
+            objects._apply {
+            }
+        }
     }
+}
+
+fun <T> T._apply(block: T.() -> Unit): T {
+    block()
+    return this
 }

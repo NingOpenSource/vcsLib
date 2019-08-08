@@ -17,13 +17,13 @@ dependencies {
         //https://github.com/edvin/tornadofx
         exclude group: 'org.jetbrains.kotlin'
     }
-    compile 'org.openjfx:javafx:12'
+//    compile('org.openjfx:javafx:12')
 
 //    compile project(':plugin-gradle')
 }
 
 
-mainClassName = "org.yanning.gradle.vcs_lib.gui.Bootstrap"
+mainClassName = "org.yanning.gradle.vcs_lib.gui.LanternaDemo"
 version = "0.0.2"
 jar {
     manifest {

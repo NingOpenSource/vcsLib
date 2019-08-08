@@ -1,0 +1,42 @@
+System.out.println("----------------vcsLib_mavenGroupId:$vcsLib_mavenGroupId")
+System.out.println("----------------vcsLib_mavenGroupId:$vcsLib_mavenVersionName")
+System.out.println("----------------vcsLib_mavenGroupId:$vcsLib_vcsLibHome")
+
+if (pluginManager.findPlugin("maven") == null) {
+    apply plugin: 'maven'
+}
+
+group vcsLib_mavenGroupId
+//name "$VCS_LIB_ARTIFACT_ID"
+version vcsLib_mavenVersionName
+
+
+task androidJavadocs(type: Javadoc) {
+    options.encoding = "utf-8"
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
+    androidJavadocs.options.encoding "UTF-8"
+    androidJavadocs.options.charSet 'UTF-8'
+    classifier = 'javadoc'
+    from androidJavadocs.destinationDir
+}
+
+task androidSourcesJar(type: Jar) {
+    classifier = 'sources'
+    from android.sourceSets.main.java.sourceFiles
+}
+
+artifacts {
+    archives androidSourcesJar
+//    archives androidJavadocsJar
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: uri(vcsLib_vcsLibHome))
+        }
+    }
+}

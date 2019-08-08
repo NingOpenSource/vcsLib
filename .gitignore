@@ -5,4 +5,5 @@ build/
 out/
 publish.bat
 *.iml
+doc/maven/
 

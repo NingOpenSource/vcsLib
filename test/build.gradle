@@ -1,5 +1,3 @@
-apply from: 'doc/vcsLibScript.gradle'
-
 buildscript {
     ext.kotlin_version = '1.3.41'
 //    ext.lib_home = 'D:\\yanning\\libs\\vcsLib\\'
@@ -8,12 +6,11 @@ buildscript {
         mavenCentral()
         jcenter()
         maven {
-            url 'doc/maven'
+            url '../doc/maven'
         }
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'com.novoda:bintray-release:+'
         classpath 'org.yanning.gradle.vcs_lib_test:plugin-gradle:0.0.1'
     }
 }
@@ -23,7 +20,6 @@ allprojects {
         google()
         jcenter()
         maven { url "https://jitpack.io" }
-
     }
 }
 
