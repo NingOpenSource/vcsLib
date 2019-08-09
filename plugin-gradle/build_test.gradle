@@ -1,8 +1,9 @@
-apply from:'https://raw.githubusercontent.com/NingOpenSource/vcsLib/master/doc/mavenDeployer_v0.0.1.gradle'
-
+apply from:'https://raw.githubusercontent.com/NingOpenSource/vcsLib/master/script/mavenDeployer_v0.0.1.gradle'
+//apply from:'../script/mavenDeployer.gradle'
 vcsMavenDeployer(
         "org.yanning.gradle.vcs_lib_test",
         "plugin-gradle",
         "0.0.1",
+//        "https://gitee.com/VarietyShop/testMaven123.git",
         "https://gitee.com/mirrors/Vugu.git",
-        new File("../doc/mavenTest").absolutePath)
+        new File("${rootDir.toPath()}/doc/mavenTest").absolutePath)

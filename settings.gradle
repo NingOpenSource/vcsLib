@@ -4,3 +4,4 @@ include ':plugin-gradle',':gui',':terminal'
 //includeBuild("doc/vcsLibScript.gradle")
 
 //includeBuild("./buildSrcTemp")
+
