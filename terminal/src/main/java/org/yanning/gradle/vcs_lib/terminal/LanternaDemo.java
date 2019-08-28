@@ -1,4 +1,4 @@
-package org.yanning.gradle.vcs_lib.gui;
+package org.yanning.gradle.vcs_lib.terminal;
 
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;

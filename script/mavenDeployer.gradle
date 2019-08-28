@@ -58,7 +58,7 @@ project.ext.vcsMavenDeployer = {
                             workingDir(vcsLibHome)
 //                            standardOutput System.out
 //                            errorOutput System.err
-                            commandLine "git","clone",vcsUri,outputDir.name
+                            commandLine "cmd","git","clone",vcsUri,outputDir.name
                             standardOutput.write("765211630@qq.com\n".getBytes())
                             standardOutput.flush()
                             standardOutput.write("940131\n".getBytes())

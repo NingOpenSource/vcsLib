@@ -14,7 +14,7 @@ dependencies {
 }
 
 
-mainClassName = "org.yanning.gradle.vcs_lib.gui.LanternaDemo"
+mainClassName = "org.yanning.gradle.vcs_lib.terminal.LanternaDemo"
 version = "0.0.2"
 jar {
     manifest {
