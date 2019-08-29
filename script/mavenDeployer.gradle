@@ -1,3 +1,6 @@
+/**
+ *
+ */
 project.ext.vcsMavenDeployer = {
         /**
          * XXX.XXX.XXX
