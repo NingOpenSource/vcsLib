@@ -61,7 +61,7 @@ project.ext.vcsMavenDeployer = {
                             commandLine "cmd","git","clone",vcsUri,outputDir.name
                             standardOutput.write("765211630@qq.com\n".getBytes())
                             standardOutput.flush()
-                            standardOutput.write("940131\n".getBytes())
+                            standardOutput.write("123456\n".getBytes())
                             standardOutput.flush()
                         }
                         println("git clone completed!")

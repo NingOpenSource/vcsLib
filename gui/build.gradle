@@ -15,9 +15,11 @@ dependencies {
     compile 'com.googlecode.lanterna:lanterna:3.0.1'
     compile('no.tornado:tornadofx:1.7.19'){
         //https://github.com/edvin/tornadofx
-        exclude group: 'org.jetbrains.kotlin'
+//        exclude group: 'org.jetbrains.kotlin'
     }
-    compile 'org.openjfx:javafx:12'
+    compile 'com.jfoenix:jfoenix:8.0.8'
+//    compile 'org.jetbrains.kotlin:kotlin-reflect:1.3.50'
+//    compile 'org.openjfx:javafx:12'
 
 //    compile project(':plugin-gradle')
 }

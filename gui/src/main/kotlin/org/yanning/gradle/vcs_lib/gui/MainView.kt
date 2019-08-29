@@ -1,7 +1,5 @@
 package org.yanning.gradle.vcs_lib.gui
 
-import javafx.beans.property.SimpleListProperty
-import javafx.scene.control.TreeItem
 import tornadofx.*
 
 
@@ -11,7 +9,9 @@ class MainView : View("My View") {
         menubar {
             menu("File") {
                 item("Settings...") {
-
+                    setOnAction {
+                        SettingsView().openModal()
+                    }
                 }
                 item("Exit") {
                     setOnAction {
