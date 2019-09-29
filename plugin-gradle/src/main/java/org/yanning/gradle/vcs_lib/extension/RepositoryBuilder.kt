@@ -8,28 +8,28 @@ import org.yanning.gradle.vcs_lib.utils.Log
 class RepositoryBuilder(
         private val conf: Conf) {
 
-    fun build(): Repository? {
+    fun build(): Repo? {
         if (conf.getConf(ConfKey.repoUri).isEmpty()) {
             Log.err("Please config '${ConfKey.repoUri.name}' in ${AppConfig.confFileName}")
             return null
         }
-        val repository: Repository
+        val repo: Repo
         if (conf.getConf(ConfKey.repoType).isNotEmpty()) {
             if (VcsType.git.name.equals(conf.getConf(ConfKey.repoType))){
-                repository = RepositoryGit(conf)
+                repo = RepoGit(conf)
             }else if (VcsType.svn.name.equals(conf.getConf(ConfKey.repoType))){
-                repository = RepositorySvn(conf)
+                repo = RepoSvn(conf)
             }else{
-                repository = RepositorySvn(conf)
+                repo = RepoSvn(conf)
             }
         } else if (VcsType.git.isThis(conf.getConf(ConfKey.repoUri))) {
-            repository = RepositoryGit(conf)
+            repo = RepoGit(conf)
         } else if (VcsType.svn.isThis(conf.getConf(ConfKey.repoUri))) {
-            repository = RepositorySvn(conf)
+            repo = RepoSvn(conf)
         } else {
-            repository = RepositorySvn(conf)
+            repo = RepoSvn(conf)
         }
-        return repository
+        return repo
     }
 
 }

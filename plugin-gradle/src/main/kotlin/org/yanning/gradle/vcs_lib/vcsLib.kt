@@ -26,20 +26,23 @@ import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
 class vcsLib : Plugin<Project> {
-
+    private val TASK_GROUP = "vcsLib"
     override fun apply(target: Project) {
-        target._apply {
-            tasks.create("vcsTest",TestTask::class.java)
-//            task("vcsTest",TestTask::class.java)
-        }
-        if (true){
+        if (true) {
             return
         }
         val appConfig = AppConfig(target)
         val config = appConfig.conf
-        if (config.getConf(ConfKey.repoUri).isEmpty()) return
+        if (config.getConf(ConfKey.uri).isEmpty()) return
         val repo = RepositoryBuilder(config).build() ?: return
-        target.tasks.register(TaskConf.vcsLibUpdate.name, UpdateTask::class.java, repo, config)
+
+        target.task(TaskConf.vcsLibUpdate.name).run {
+            doFirst {
+                Log.out("repo update start...");
+                repo.update();
+                Log.out("repo update end...");
+            }
+        }
         /**
          * 添加仓库地址
          */
@@ -48,15 +51,6 @@ class vcsLib : Plugin<Project> {
                     it.name = "vcsLib-${target.name}"
                     it.url = repo.outDir().toURI()
                 })
-
-
-        if (target.tasks.findByName(TaskConf.vcsLibGUI.name) == null) {
-            /**
-             * 创建GUI命令
-             */
-            target.tasks.register(TaskConf.vcsLibGUI.name, GUITask::class.java,target)
-        }
-
         if (true.toString() == config.getConf(ConfKey.isUseUploadMaven)) {
             /**
              * 配置上传
@@ -99,42 +93,24 @@ class vcsLib : Plugin<Project> {
                     Log.err("apply from ${fileScript.absolutePath}->")
                     target.apply { objectConfigurationAction -> objectConfigurationAction.from(fileScript) }
                 }
-
-                target.tasks.register(TaskConf.vcsLibUpload.name, UploadTask::class.java, repo, config)
-                target.tasks.findByName(TaskConf.vcsLibUpload.name)
-                        ?.dependsOn(target.tasks.findByName(TaskConf.vcsLibUpdate.name))
-                        //执行上传到vcs目录的命令
-                        ?.dependsOn(target.tasks.findByName("uploadArchives"))
+                target.task(TaskConf.vcsLibUpload.name).run {
+                    group = TASK_GROUP
+                    dependsOn(target.tasks.findByName(TaskConf.vcsLibUpload.name)?.path,
+                            target.tasks.findByName("uploadArchives")?.path)
+                    doFirst {
+                        Log.out("start update...")
+                        repo.update()
+                        Log.out("complete update,start upload..." + " [from " + repo.outDir() + " to " + config.getConf(ConfKey.repoUri) + "]")
+                        repo.upload()
+                        Log.out("complete doUpload.")
+                    }
+                }
             } catch (e: Exception) {
                 Log.err(e.localizedMessage)
                 e.printStackTrace()
             }
 
         }
-        target._apply {
-            apply {
-                it._apply {
-//                    from("")
-                    plugin(MavenPlugin::class.java)
-                }
-            }
-
-            tasks.create("")._apply {
-
-            }
-
-            Git.open(File(""))
-
-            dependencies._apply {
-                add("implementation",create(""))
-            }
-            objects._apply {
-            }
-        }
+        target.plugins.apply(MavenPlugin::class.java)
     }
-}
-
-fun <T> T._apply(block: T.() -> Unit): T {
-    block()
-    return this
 }

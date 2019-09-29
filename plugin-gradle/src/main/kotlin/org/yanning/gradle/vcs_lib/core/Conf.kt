@@ -1,11 +1,8 @@
 package org.yanning.gradle.vcs_lib.core
 
-import jodd.io.StreamUtil
 import jodd.util.PropertiesUtil
-import org.yanning.gradle.vcs_lib.extension.VcsType
 import org.yanning.gradle.vcs_lib.utils.Log
 import java.io.File
-import java.io.FileInputStream
 import java.io.FileWriter
 import java.text.SimpleDateFormat
 import java.util.*
@@ -13,23 +10,21 @@ import java.util.*
 
 class Conf(
         private val file: File) {
-    private val props = OrderProperties()
+    private val props = Properties()
 
     init {
 
         if (!file.exists()) file.createNewFile()
-        var fis: FileInputStream? = null
-        try {
-            fis = FileInputStream(file)
-            props.load(fis)
-        } finally {
-            StreamUtil.close(fis)
-        }
+        PropertiesUtil.loadFromFile(props, file)
         Log.out("props:$props")
     }
 
-    fun setConf(confKey: ConfKey, value: String): Conf {
-        props.setProperty(confKey.name, value)
+    fun setConf(confKey: ConfKey, value: String?): Conf {
+        if (value.isNullOrEmpty()) {
+            props.setProperty(confKey.name, confKey.defaultValue)
+        } else {
+            props.setProperty(confKey.name, value)
+        }
         return this
     }
 
@@ -38,45 +33,29 @@ class Conf(
     }
 
     fun getConf(confKey: ConfKey, defaultValue: String): String {
+        var value = props.getProperty(confKey.name) ?: defaultValue
+        if (confKey.defaultValue == value) value = defaultValue
         Log.out("getConf:$confKey")
-        if (props.getProperty(confKey.name).isNullOrEmpty()) return defaultValue
-        return props.getProperty(confKey.name)
+        return value
     }
 
     fun apply() {
         val fileWriter = FileWriter(file)
-        props.orderStore(fileWriter, "update on " + SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Date())
-                + "\n## Demo:"
-                + "\n## ${ConfKey.repoUri.displyName()}:https\\://github.com/demo/demo.git"
-                + "\n## ${ConfKey.repoType.displyName()}:${VcsType.svn.name}/${VcsType.git.name}"
-                + "\n## ${ConfKey.repoUsername.displyName()}:Nullable"
-                + "\n## ${ConfKey.repoPassword.displyName()}:Nullable"
-                + "\n## ${ConfKey.isAutoUpdateRepoOnBuild.displyName()}:true/false (default is false)"
-                + "\n## ${ConfKey.isUseUploadMaven.displyName()}:true/false (default is false)"
-                + "\n## if(!${ConfKey.isUseUploadMaven.displyName()}) return"
-                + "\n## ${ConfKey.mavenUploadType.displyName()}:${LibrarySuffix.JAR.name.toLowerCase()}/${LibrarySuffix.AAR.name.toLowerCase()}"
-                + "\n## ${ConfKey.mavenGroupId.displyName()}:org.demo"
-                + "\n## ${ConfKey.mavenArtifactId.displyName()}:demo123"
-                + "\n## ${ConfKey.mavenVersionName.displyName()}:1.2.3")
+        props.store(fileWriter, "update on " + SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Date()))
         fileWriter.close()
     }
 
     fun resetBaseConf(): Conf {
-        props.setPropertyWithComment(ConfKey.vcsLibHome.name, "", "nullable, vcsLibs home dir,default is [USER_HOME]/.vcsLib")
-        props.setPropertyWithComment(ConfKey.repoUri.name, "", "")
-        props.setPropertyWithComment(ConfKey.repoType.name, "", "svn/git")
-        props.setPropertyWithComment(ConfKey.repoUsername.name, "", "nullable")
-        props.setPropertyWithComment(ConfKey.repoPassword.name, "", "nullable")
-        props.setPropertyWithComment(ConfKey.isAutoUpdateRepoOnBuild.name, false.toString(), "true/false,default is false")
+        setConf(ConfKey.VCSLIB_HOME, null)
+        setConf(ConfKey.uri, null)
+        setConf(ConfKey.user, null)
+        setConf(ConfKey.passwd, null)
+        setConf(ConfKey.isAutoUpdateOnBuild, null)
         return this
     }
 
     fun resetMavenConf(): Conf {
-        props.setPropertyWithComment(ConfKey.isUseUploadMaven.name, false.toString(), "true/false,default is false")
-        props.setPropertyWithComment(ConfKey.mavenUploadType.name, "jar", "jar/aar,default is jar")
-        props.setPropertyWithComment(ConfKey.mavenGroupId.name, "", "")
-        props.setPropertyWithComment(ConfKey.mavenArtifactId.name, "", "")
-        props.setPropertyWithComment(ConfKey.mavenVersionName.name, "", "")
+        setConf(ConfKey.mavenId, null)
         return this
     }
 }
@@ -84,55 +63,33 @@ class Conf(
 /**
  *
  */
-enum class ConfKey {
+enum class ConfKey(val defaultValue: String) {
     /**
      *
      */
-    vcsLibHome,
+    VCSLIB_HOME("~/.vcsLib"),
     //################################################################################
     /**
      *仓库地址
      */
-    repoUri,
-    /**
-     * 仓库类型(svn/git)
-     */
-    repoType,
+    uri("[Nonull] please input your vcs uri"),
     /**
      * 仓库登录用户名，没有则不填
      */
-    repoUsername,
+    user("[Nonull] please input your vcs username"),
     /**
      *仓库登录密码，没有则不填
      */
-    repoPassword,
+    passwd("[Nonull] please input your vcs password"),
     /**
      * 是否在编译时自动更新仓库（true/false,default is false）（PS:可能会增加编译时长）
      */
-    isAutoUpdateRepoOnBuild,
+    isAutoUpdateOnBuild("false"),
     //################################################################################
     /**
-     * 是否使用上传功能(true/false)
+     * group:name:version
      */
-    isUseUploadMaven,
-    /**
-     * 仓库上传类型(jar/aar)
-     */
-    mavenUploadType,
-    //################################################################################
-
-    /**
-     *
-     */
-    mavenGroupId,
-    /**
-     *
-     */
-    mavenArtifactId,
-    /**
-     *
-     */
-    mavenVersionName;
+    mavenId("[Nullable] please input 'group:name:version' like 'org.demo:demoLib:0.0.1'");
 
     /**
      *

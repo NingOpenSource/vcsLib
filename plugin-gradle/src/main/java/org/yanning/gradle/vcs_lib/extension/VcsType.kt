@@ -1,31 +1,10 @@
-package org.yanning.gradle.vcs_lib.extension;
+package org.yanning.gradle.vcs_lib.extension
 
-public enum VcsType {
-    svn(url -> {
-        if (url != null && url.startsWith("svn:")) {
-            return true;
-        }
-        return false;
-    }), git(url -> {
-        if (url != null && url.endsWith(".git")) {
-            return true;
-        }
-        return false;
+enum class VcsType private constructor(val isThis: (url: String) -> Boolean) {
+    svn({ url ->
+        url != null && url.startsWith("svn:")
+    }),
+    git({ url ->
+        url != null && url.endsWith(".git")
     });
-
-    private interface Checker {
-        boolean isThis(String url);
-
-    }
-
-
-    private Checker checker;
-
-    VcsType(Checker checker) {
-        this.checker = checker;
-    }
-
-    public boolean isThis(String url) {
-        return checker.isThis(url);
-    }
 }
