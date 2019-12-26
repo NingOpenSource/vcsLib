@@ -7,11 +7,7 @@ class AppConfig(private val target: Project) {
     companion object {
         const val confFileName = "vcsLib.properties"
 
-        val vcsLibHome = getDefaultVCSLibHome()
-
-        private fun getDefaultVCSLibHome(): File {
-            return File(System.getProperty("user.home"), ".vcsLib");
-        }
+        val vcsLibHome = File(System.getProperty("user.home"), ".vcsLib")
     }
 
     val conf: Conf

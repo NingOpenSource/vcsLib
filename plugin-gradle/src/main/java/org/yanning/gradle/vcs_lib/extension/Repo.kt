@@ -1,14 +1,10 @@
 package org.yanning.gradle.vcs_lib.extension
 
-import org.yanning.gradle.vcs_lib.core.AppConfig
-import org.yanning.gradle.vcs_lib.core.Conf
-import org.yanning.gradle.vcs_lib.core.ConfKey
-
+import org.yanning.gradle.vcs_lib.core.RepoConfig
 import java.io.File
 import java.io.UnsupportedEncodingException
-import java.net.URLEncoder
 
-abstract class Repo internal constructor(internal val conf: Conf) {
+abstract class Repo internal constructor(internal val conf: RepoConfig) {
     private lateinit var outDir: File
 
     fun outDir(): File {
@@ -21,8 +17,7 @@ abstract class Repo internal constructor(internal val conf: Conf) {
             //                e.printStackTrace();
             //            }
             try {
-                outDir = File(File(conf.getConf(ConfKey.vcsLibHome, AppConfig.vcsLibHome.absolutePath)),
-                        URLEncoder.encode(conf.getConf(ConfKey.repoUri), "utf-8"))
+                outDir = RepoConfig.outDir(conf.uri)
             } catch (e: UnsupportedEncodingException) {
                 e.printStackTrace()
             }

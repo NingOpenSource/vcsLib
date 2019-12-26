@@ -1,18 +1,15 @@
-/**
- * @param mavenId com.demo:demo123:0.0.1
- * @param outputDir file path
- */
-project.ext.localMavenDeployerConfig = { String mavenId, String outputDir ->
-    setLocalMavenDeployer(mavenId, outputDir)
+if (pluginManager.findPlugin("maven") == null) {
+    apply plugin: 'maven'
 }
 
+setLocalMavenDeployer("$vcsLib_mavenId",vcsLib_VCSLIB_HOME)
 
 /**
  *
- * @param mavenId       com.demo:demo123:0.0.1
- * @param outputDir     file path
+ * @param mavenId   com.demo:demo123:0.0.1
+ * @param outputDir file path
  */
-void setLocalMavenDeployer(String mavenId, String outputDir) {
+void setLocalMavenDeployer(String mavenId, String outputDir){
     String[] mavenIdInfo = mavenId.split(":")
     if (mavenIdInfo.length != 3 || mavenIdInfo[0].length() == 0 || mavenIdInfo[1].length() == 0 || mavenIdInfo[2].length() == 0) {
         println("mavenId:$mavenId is wrong!")

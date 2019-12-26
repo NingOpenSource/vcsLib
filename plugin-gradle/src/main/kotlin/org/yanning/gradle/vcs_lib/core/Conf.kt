@@ -10,6 +10,9 @@ import java.util.*
 
 class Conf(
         private val file: File) {
+
+
+
     private val props = Properties()
 
     init {
@@ -46,7 +49,6 @@ class Conf(
     }
 
     fun resetBaseConf(): Conf {
-        setConf(ConfKey.VCSLIB_HOME, null)
         setConf(ConfKey.uri, null)
         setConf(ConfKey.user, null)
         setConf(ConfKey.passwd, null)
@@ -67,7 +69,7 @@ enum class ConfKey(val defaultValue: String) {
     /**
      *
      */
-    VCSLIB_HOME("~/.vcsLib"),
+//    VCSLIB_HOME("~/.vcsLib"),
     //################################################################################
     /**
      *仓库地址

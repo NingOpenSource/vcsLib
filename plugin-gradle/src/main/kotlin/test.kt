@@ -2,10 +2,10 @@ import jodd.props.Props
 import jodd.props.PropsConverter
 import jodd.system.SystemUtil
 import jodd.util.PropertiesUtil
+import org.gradle.internal.impldep.org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
 import org.yanning.gradle.vcs_lib.core.AppConfig
 import org.yanning.gradle.vcs_lib.core.Conf
 import org.yanning.gradle.vcs_lib.core.ConfKey
-import org.yanning.gradle.vcs_lib.core.OrderProperties
 import org.yanning.gradle.vcs_lib.extension.MavenBuild
 import org.yanning.gradle.vcs_lib.utils.Log
 import java.io.File
@@ -32,6 +32,15 @@ class Test {
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {
+            testSVN()
+        }
+
+        fun testSVN() {
+            println(UsernamePasswordCredentialsProvider.getDefault().toString())
+        }
+
+        fun testOld() {
+
 //            Log.err(javaClass.getResource("vcsLibUpload_aar.gradle").toString())
             val f = File("./vcsLib.properties")
             if (!f.exists()) f.createNewFile()
