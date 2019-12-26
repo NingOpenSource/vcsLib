@@ -22,6 +22,9 @@ dependencies {
 //    compile 'org.openjfx:javafx:12'
 
 //    compile project(':plugin-gradle')
+
+    compile 'com.jgoodies:forms:1.2.1'
+    compile 'com.intellij:forms_rt:7.0.3'
 }
 
 

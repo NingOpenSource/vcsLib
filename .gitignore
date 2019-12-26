@@ -7,4 +7,5 @@ publish.bat
 *.iml
 doc/maven/
 doc/mavenTest/
+local.properties
 
