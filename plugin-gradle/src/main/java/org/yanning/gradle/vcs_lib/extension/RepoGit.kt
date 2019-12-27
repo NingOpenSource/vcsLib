@@ -8,58 +8,85 @@ import org.gradle.internal.impldep.org.eclipse.jgit.lib.AnyObjectId
 import org.gradle.internal.impldep.org.eclipse.jgit.transport.CredentialsProvider
 import org.gradle.internal.impldep.org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
 import org.gradle.api.logging.Logging
-import org.yanning.gradle.vcs_lib.core.Conf
-import org.yanning.gradle.vcs_lib.core.ConfKey
+import org.gradle.internal.impldep.org.eclipse.jgit.lib.BatchingProgressMonitor
+import org.gradle.internal.impldep.org.eclipse.jgit.lib.ProgressMonitor
+import org.yanning.gradle.vcs_lib.core.RepoConfig
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
-class RepoGit(conf: Conf) : Repo(conf) {
-    private var git: Git = if (hasCheckout()){
-        Git.open(outDir())
-    }else{
+class RepoGit(conf: RepoConfig) : Repo(conf) {
+    private fun log(text: String) {
+        println("git(${conf.uri}) -> $text")
+    }
+
+    private var git: Git = if (hasCheckout()) {
+        Git.open(outDir)
+    } else {
         Git.cloneRepository()
                 .setCredentialsProvider(getCredentialsProvider())
                 .setCloneAllBranches(false)
                 .setCloneSubmodules(false)
-                .setDirectory(outDir())
-                .setCallback(object : CloneCommand.Callback {
-                    override fun initializedSubmodules(submodules: Collection<String>) {
-
-                    }
-
-                    override fun cloningSubmodule(path: String) {
-
-                    }
-
-                    override fun checkingOut(commit: AnyObjectId, path: String) {
-
-                    }
-                })
-                .setURI(conf.getConf(ConfKey.repoUri))
+                .setDirectory(outDir)
+                .setProgressMonitor(newProgressMonitor())
+//                .setCallback(object : CloneCommand.Callback {
+//                    override fun initializedSubmodules(submodules: Collection<String>) {
+//                        submodules.forEach {
+//                            log("initializedSubmodules: $it")
+//                        }
+//                    }
+//
+//                    override fun cloningSubmodule(path: String) {
+//                        log("cloningSubmodule: $path")
+//                    }
+//
+//                    override fun checkingOut(commit: AnyObjectId, path: String) {
+//                        log("checkingOut: ${commit.name} -> $path")
+//                    }
+//                })
+                .setURI(conf.uri)
                 .call()
     }
 
     private fun getCredentialsProvider(): CredentialsProvider {
-        return UsernamePasswordCredentialsProvider(conf.getConf(ConfKey.repoUsername), conf.getConf(ConfKey.repoPassword))
+        return UsernamePasswordCredentialsProvider(conf.user, conf.passwd)
     }
+
+    private fun newProgressMonitor(): ProgressMonitor = object : BatchingProgressMonitor() {
+
+        override fun onUpdate(taskName: String?, workCurr: Int) {
+            onUpdate(taskName,workCurr,workCurr,100)
+        }
+
+        override fun onUpdate(taskName: String?, workCurr: Int, workTotal: Int, percentDone: Int) {
+            log("$taskName: $percentDone%")
+        }
+
+        override fun onEndTask(taskName: String?, workCurr: Int) {
+            onEndTask(taskName,workCurr,workCurr,100)
+        }
+
+        override fun onEndTask(taskName: String?, workCurr: Int, workTotal: Int, percentDone: Int) {
+            log("$taskName: $percentDone%")
+        }
+    }
+
     private fun isGitRepository(): Boolean {
-        return FileUtil.isExistingFolder(File(outDir(), ".git"))
+        return FileUtil.isExistingFolder(File(outDir, ".git"))
     }
 
     override fun hasCheckout(): Boolean {
-        return FileUtil.isExistingFolder(File(outDir(), ".git"))
+        return FileUtil.isExistingFolder(File(outDir, ".git"))
     }
 
     override fun update() {
-        git.pull().setTransportConfigCallback { transport ->
-
-        }.setCredentialsProvider(getCredentialsProvider()).call()
-        Logging.getLogger("vcsLibs").info("update", "from " + conf.getConf(ConfKey.repoUri) + " to " + outDir().path)
-        System.out.println("vcsLibs:update --> from " + conf.getConf(ConfKey.repoUri) + " to " + outDir().path)
+        log("update: start")
+        git.pull().setProgressMonitor(newProgressMonitor()).setCredentialsProvider(getCredentialsProvider()).call()
+//        Logging.getLogger("vcsLibs").info("update", "from " + conf.uri + " to " + outDir.path)
+        log("update: end")
     }
 
-    private fun commit(){
+    private fun commit() {
         val diffEntries = git.diff()
                 //                        .setPathFilter(PathFilterGroup.createFromStrings(outDir().getPath()))
                 .setShowNameAndStatusOnly(true).call()
@@ -92,6 +119,6 @@ class RepoGit(conf: Conf) : Repo(conf) {
         git.push().setTransportConfigCallback({ transport -> }).setCredentialsProvider(getCredentialsProvider()).setForce(false).call()
     }
 
-    override fun vcsType(): VcsType =VcsType.git
+//    override fun vcsType(): VcsType =VcsType.git
 
 }

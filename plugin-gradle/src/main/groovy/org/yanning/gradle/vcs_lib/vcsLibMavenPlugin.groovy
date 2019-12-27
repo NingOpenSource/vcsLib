@@ -12,6 +12,9 @@ import org.yanning.gradle.vcs_lib.core.RepoConfig
 class vcsLibMavenPlugin implements Plugin<Project> {
     class vcsLibMaven {
         String mavenId = ''
+        /**
+         * 仓库地址
+         */
         String uri = ''
         String user = ''
         String passwd = ''

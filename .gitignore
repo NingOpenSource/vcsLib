@@ -8,4 +8,6 @@ publish.bat
 doc/maven/
 doc/mavenTest/
 local.properties
+temp.conf.json
+*.log
 

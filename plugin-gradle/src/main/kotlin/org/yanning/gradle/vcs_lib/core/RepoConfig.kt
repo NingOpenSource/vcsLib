@@ -7,9 +7,9 @@ import java.io.UnsupportedEncodingException
 import java.net.URLEncoder
 
 class RepoConfig {
-    val uri = ""
-    val user = ""
-    val passwd = ""
+    var uri = ""
+    var user = ""
+    var passwd = ""
 
     companion object {
         @JvmStatic
@@ -18,17 +18,21 @@ class RepoConfig {
                     URLEncoder.encode(uri, "utf-8"))
         }
 
-        fun loadConfs(file: File): Array<RepoConfig> {
+        fun loadConfs(file: File): HashMap<String, RepoConfig> {
             if (file.exists()) {
-                return Gson().fromJson(file.readText(), Array<RepoConfig>::class.java)
+                val result = hashMapOf<String, RepoConfig>()
+                Gson().fromJson(file.readText(), Array<RepoConfig>::class.java)
                         .filter {
                             it.uri.isNotEmpty()
-                        }.toTypedArray()
+                        }.forEach {
+                            result.put(it.uri, it)
+                        }
+                return result
             } else {
                 file.createNewFile()
-                val confs = arrayOf<RepoConfig>()
+                val confs = arrayOf<RepoConfig>().plus(RepoConfig())
                 file.writeText(GsonBuilder().setPrettyPrinting().create().toJson(confs))
-                return confs
+                return hashMapOf()
             }
         }
     }
