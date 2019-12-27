@@ -55,7 +55,7 @@ class RepoGit(conf: RepoConfig) : Repo(conf) {
     private fun newProgressMonitor(): ProgressMonitor = object : BatchingProgressMonitor() {
 
         override fun onUpdate(taskName: String?, workCurr: Int) {
-            onUpdate(taskName,workCurr,workCurr,100)
+            onUpdate(taskName, workCurr, workCurr, 100)
         }
 
         override fun onUpdate(taskName: String?, workCurr: Int, workTotal: Int, percentDone: Int) {
@@ -63,7 +63,7 @@ class RepoGit(conf: RepoConfig) : Repo(conf) {
         }
 
         override fun onEndTask(taskName: String?, workCurr: Int) {
-            onEndTask(taskName,workCurr,workCurr,100)
+            onEndTask(taskName, workCurr, workCurr, 100)
         }
 
         override fun onEndTask(taskName: String?, workCurr: Int, workTotal: Int, percentDone: Int) {
@@ -80,10 +80,14 @@ class RepoGit(conf: RepoConfig) : Repo(conf) {
     }
 
     override fun update() {
-        log("update: start")
-        git.pull().setProgressMonitor(newProgressMonitor()).setCredentialsProvider(getCredentialsProvider()).call()
+        try {
+            log("update: start")
+            git.pull().setProgressMonitor(newProgressMonitor()).setCredentialsProvider(getCredentialsProvider()).call()
+            log("update: end")
+        } catch (e: Exception) {
+            log("update: end, error=${e.localizedMessage}")
+        }
 //        Logging.getLogger("vcsLibs").info("update", "from " + conf.uri + " to " + outDir.path)
-        log("update: end")
     }
 
     private fun commit() {
@@ -116,7 +120,7 @@ class RepoGit(conf: RepoConfig) : Repo(conf) {
     }
 
     override fun upload() {
-        git.push().setTransportConfigCallback({ transport -> }).setCredentialsProvider(getCredentialsProvider()).setForce(false).call()
+        git.push().setProgressMonitor(newProgressMonitor()).setCredentialsProvider(getCredentialsProvider()).setForce(false).call()
     }
 
 //    override fun vcsType(): VcsType =VcsType.git

@@ -11,7 +11,7 @@ class Test {
             RepoConfig.loadConfs(File("temp.conf.json")).also { confs ->
                 println(GsonBuilder().setPrettyPrinting().create().toJson(confs))
                 confs.forEach { (_, u) ->
-                    testSVN_1(u)
+                    testSVN_0(u)
                 }
             }
         }
@@ -25,7 +25,7 @@ class Test {
                 thread(start = true) {
                     for (index in 0..10){
                         thread(start = true){
-                            svn.update()
+                            svn.updateWithLimit()
                         }
                     }
                 }
@@ -34,7 +34,7 @@ class Test {
 
         fun testSVN_1(conf: RepoConfig) {
             RepoHelper(conf).connectRepo()?.also {svn->
-                svn.update()
+                svn.updateWithLimit()
 //                svn.upload()
             }
         }
