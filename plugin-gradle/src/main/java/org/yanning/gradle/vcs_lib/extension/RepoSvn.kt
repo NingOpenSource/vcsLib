@@ -9,10 +9,17 @@ import org.tmatesoft.svn.core.wc.SVNRevision
 import org.tmatesoft.svn.core.wc.SVNWCUtil
 import org.yanning.gradle.vcs_lib.core.RepoConfig
 import java.io.File
+import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
 
 class RepoSvn(conf: RepoConfig) : Repo(conf) {
+    private fun log(text: String) {
+        println("svn(${conf.uri}) -> $text")
+    }
+    private fun err(text: String) {
+        System.err.println("svn(${conf.uri}) -> $text")
+    }
     private val options = SVNWCUtil.createDefaultOptions(true)
 
 
@@ -31,8 +38,9 @@ class RepoSvn(conf: RepoConfig) : Repo(conf) {
                 clientManager.wcClient.doAdd(arrayOf(dir), true,
                         false, false, SVNDepth.INFINITY, false, false,
                         true)
-            } catch (e: SVNException) {
+            } catch (e: Exception) {
                 e.printStackTrace()
+                err("check: error=${e.localizedMessage}")
             }
 
         }
@@ -50,7 +58,7 @@ class RepoSvn(conf: RepoConfig) : Repo(conf) {
 
     override fun update() {
         try {
-            println("start svn update：${conf.uri}")
+            log("update: start")
             val svnurl = SVNURL.parseURIEncoded(conf.uri)
             if (!outDir.exists()) {//不存在的目录需要进行检出
                 val svnUpdateClient = newClientManager().updateClient
@@ -59,25 +67,24 @@ class RepoSvn(conf: RepoConfig) : Repo(conf) {
                 val svnUpdateClient = newClientManager().updateClient
                 svnUpdateClient.doUpdate(outDir, SVNRevision.HEAD, SVNDepth.INFINITY, false, true)
             }
-            println("end svn update success: ${conf.uri}")
-        } catch (e: SVNException) {
-            println("end svn update error: ${conf.uri} , message:${e.errorMessage}")
+            log("update: success")
+        } catch (e: Exception) {
+            err("update: error=${e.localizedMessage}")
         }
-
     }
 
     override fun upload() {
         update()
         try {
-            println("start svn upload：${conf.uri}")
+            log("upload: start")
             val svnCommitClient = newClientManager().commitClient
             svnCommitClient.doCommit(
                     arrayOf(outDir),
                     true,
                     SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Date()), null, null, false, false, SVNDepth.INFINITY)
-            println("end svn upload success: ${conf.uri}")
-        } catch (e: SVNException) {
-            println("end svn upload error: ${conf.uri} , message:${e.errorMessage}")
+            log("upload: success")
+        } catch (e: Exception) {
+            err("upload: error=${e.localizedMessage}")
         }
     }
 

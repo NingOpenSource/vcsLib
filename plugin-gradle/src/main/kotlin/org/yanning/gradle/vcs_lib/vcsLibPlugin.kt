@@ -38,7 +38,7 @@ class vcsLibPlugin : Plugin<Project> {
             dependsOn(":build")
             group = TASK_GROUP
             actions.add(Action {
-                repoConfList.forEach { (uri, conf) ->
+                repoConfList.forEach { (_, conf) ->
                     RepoHelper(conf).connectRepo()?.apply {
                         Log.out("repo update start...")
                         update()

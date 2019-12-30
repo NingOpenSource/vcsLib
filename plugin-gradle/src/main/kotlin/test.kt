@@ -10,32 +10,34 @@ class Test {
         fun main(args: Array<String>) {
             RepoConfig.loadConfs(File("temp.conf.json")).also { confs ->
                 println(GsonBuilder().setPrettyPrinting().create().toJson(confs))
+//                testUpload(confs[confs.keys.toList()[0]]!!)
                 confs.forEach { (_, u) ->
-                    testSVN_0(u)
+                    testUpload(u)
                 }
             }
         }
 
-        fun testGIT(conf: RepoConfig) {
-
-        }
-
-        fun testSVN_0(conf: RepoConfig) {
-            RepoHelper(conf).connectRepo()?.also {svn->
+        fun testUpload(conf: RepoConfig) {
+            RepoHelper(conf).connectRepo()?.also {repo->
                 thread(start = true) {
                     for (index in 0..10){
                         thread(start = true){
-                            svn.updateWithLimit()
+                            repo.upload()
                         }
                     }
                 }
             }
         }
 
-        fun testSVN_1(conf: RepoConfig) {
-            RepoHelper(conf).connectRepo()?.also {svn->
-                svn.updateWithLimit()
-//                svn.upload()
+        fun testUpdate(conf: RepoConfig) {
+            RepoHelper(conf).connectRepo()?.also {repo->
+                thread(start = true) {
+                    for (index in 0..10){
+                        thread(start = true){
+                            repo.updateWithLimit()
+                        }
+                    }
+                }
             }
         }
     }

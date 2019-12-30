@@ -5,9 +5,6 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.javadoc.Javadoc
-import org.yanning.gradle.vcs_lib.core.AppConfig
-import org.yanning.gradle.vcs_lib.core.RepoConfig
-
 
 class vcsLibMavenPlugin implements Plugin<Project> {
     class vcsLibMaven {

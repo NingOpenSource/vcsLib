@@ -3,7 +3,6 @@ package org.yanning.gradle.vcs_lib.core
 import org.gradle.internal.impldep.com.google.gson.Gson
 import org.gradle.internal.impldep.com.google.gson.GsonBuilder
 import java.io.File
-import java.io.UnsupportedEncodingException
 import java.net.URLEncoder
 
 class RepoConfig {
