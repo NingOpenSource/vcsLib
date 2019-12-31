@@ -1,0 +1,432 @@
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurperClassic
+import org.codehaus.groovy.util.StringUtil
+
+import java.nio.charset.Charset
+
+println("\r\n************************\r\n"
+        + "** NAME   : vcsLib gradle script (Using the local svn / git command)\r\n"
+        + "** VERSION: 3.0.1\r\n"
+        + "** NOTE   : only support master branch on git\r\n"
+        + "** Instructions and source code can be accessed at the following address:\r\n"
+        + "**   github -> https://github.com/NingOpenSource/vcsLib\r\n"
+        + "**   gitee  -> https://gitee.com/NingOpenSource/vcsLib\r\n"
+        + "************************\r\n\r\n")
+/**
+ ************* vcsLib gradle脚本版（使用本地的svn/git命令）*************************
+ * 请注意，git上的maven不支持分支和标签，可以修改此文件获取支持
+ */
+/**
+ *
+ */
+final class App {
+    static final boolean isDebug = true
+    static final String confFileName = "vcsLib.json"
+    static final String mavenConfFileName = "vcsLib.maven.json"
+    /**
+     * 软件存储主目录
+     */
+    static final File vcsLibHome = new File(System.getProperty("user.home"), ".vcsLib")
+    static final String defaultCharset = Charset.defaultCharset()
+    static {
+        if (vcsLibHome.exists() && vcsLibHome.isFile()) {
+            vcsLibHome.delete()
+        }
+        if (!vcsLibHome.exists()) {
+            vcsLibHome.mkdir()
+        }
+    }
+
+    static void logD(String text) {
+        println("vcsLib: $text")
+    }
+
+    static void logE(String text) {
+        System.err.println("vcsLib: $text")
+    }
+
+    static void exec(String tag, String cmd) {
+        exec(tag, null, cmd)
+    }
+
+    static void exec(String tag, File dir, String cmd) {
+        String[] envp = ["LC_MESSAGES=en_US"]//设置svn输出英文，中文输出在某些特殊操作系统（或IDE）下会出现乱码
+        Process process = Runtime.getRuntime().exec(cmd, envp, dir)
+        String lineText = null
+        BufferedReader reader = process.in.newReader()
+        while ((lineText = reader.readLine()) != null) {
+            logD("$tag $lineText")
+        }
+        reader.close()
+        BufferedReader errorReader = process.errorStream.newReader()
+        while ((lineText = errorReader.readLine()) != null) {
+            logD("$tag $lineText")
+        }
+        errorReader.close()
+        reader = null
+        errorReader = null
+        lineText = null
+        envp = null
+        process = null
+    }
+}
+
+class RepoConfig {
+    String uri = ""
+    String user = ""
+    String passwd = ""
+
+    static File outDir(String uri) {
+        if (App.isDebug) {
+            return new File(App.vcsLibHome,
+                    "debug." + URLEncoder.encode(uri, "utf-8"))
+        } else {
+            return new File(App.vcsLibHome,
+                    URLEncoder.encode(uri, "utf-8"))
+        }
+    }
+    /**
+     * merge rootDir&projectDir
+     * @param rootDir
+     * @param projectDir
+     * @return
+     */
+    static HashMap<String, RepoConfig> loadMergeConfs(File rootDir, File projectDir) {
+        if (rootDir.absolutePath.equals(projectDir.absolutePath)) {
+            return loadConfs(new File(rootDir, App.confFileName))
+        }
+        HashMap<String, RepoConfig> rootConfMap = loadConfs(new File(rootDir, App.confFileName))
+        HashMap<String, RepoConfig> projectConfMap = loadConfs(new File(projectDir, App.confFileName))
+        for (String key : projectConfMap.keySet()) {
+            RepoConfig rc = projectConfMap.get(key)
+            if (rootConfMap.containsKey(key)) {
+                if (rc != null && !rc.uri.isEmpty() && !rc.user.isEmpty() && !rc.passwd.isEmpty())
+                    rootConfMap.put(key, rc)
+            } else {
+                rootConfMap.put(key, rc)
+            }
+        }
+    }
+
+    private static HashMap<String, RepoConfig> loadConfs(File file) {
+        if (file.exists()) {
+            HashMap result = new HashMap<String, RepoConfig>()
+            ArrayList<HashMap> repoConfs = new JsonSlurperClassic().parse(file)
+            repoConfs.each { conf ->
+                RepoConfig repoConfig = new RepoConfig()
+                repoConfig.user = conf.user
+                repoConfig.passwd = conf.passwd
+                repoConfig.uri = conf.uri
+                if (!repoConfig.uri.isEmpty()) {
+                    result.put(repoConfig.uri, repoConfig)
+                }
+            }
+            return result
+        } else {
+            file.createNewFile()
+            file.write(JsonOutput.prettyPrint(JsonOutput.toJson([[uri: "", user: "", passwd: "",]])))
+            return new HashMap<String, RepoConfig>()
+        }
+    }
+}
+
+
+abstract class Repo {
+    final RepoConfig repoConfig
+    final File outDir
+    final File updateTagFile
+    /**
+     * 用于限制频繁更新maven仓库的时间，在1小时以内不再进行重复的更新操作
+     */
+    final long limitTime = 1000 * 60 * 60 * 1
+
+    Repo(RepoConfig repoConfig) {
+        this.repoConfig = repoConfig
+        outDir = RepoConfig.outDir(repoConfig.uri)
+        updateTagFile = new File(outDir.parent, ".${outDir.name}")
+    }
+
+    abstract boolean hasCheckout()
+
+    abstract void update()
+
+    abstract void upload()
+
+    /**
+     * 可防止重复更新操作，加快编译速度
+     */
+    void updateWithLimit() {
+        if (!updateTagFile.exists()) {
+            updateTagFile.createNewFile()
+            update()
+        } else if (System.currentTimeMillis() - updateTagFile.lastModified() > limitTime) {
+            updateTagFile.setLastModified(System.currentTimeMillis())//更新最后修改的时间
+            update()
+        } else {
+            App.logD("repo(${repoConfig.uri}) has updated!(limit time is 1h, you can update force by 'gradle vcsLibUpdate')")
+        }
+    }
+}
+
+class RepoGit extends Repo {
+
+    RepoGit(RepoConfig repoConfig) {
+        super(repoConfig)
+    }
+    /**
+     * 将密码与uri组合
+     * @return
+     */
+    private String wrapperUri() {
+        if (repoConfig.user.isEmpty() || repoConfig.passwd.isEmpty()) {//一般可能时公开的git仓库，或者本地文件夹的绝对路径或者形如file://的uri路径
+            return repoConfig.uri
+        }
+        if (repoConfig.uri.contains("https://") || repoConfig.uri.contains("http://")) {
+            String[] tempUriBlocks = repoConfig.uri.split("//")
+            if (tempUriBlocks[1].contains("@")) {
+//这是一个已经包含用户名密码的链接,例如：https://username:password@git.oschina.net/wdm/familycloud.git
+                return repoConfig.uri
+            } else {
+                return "${tempUriBlocks[0]}//${URLEncoder.encode(repoConfig.user, "utf-8")}:${URLEncoder.encode(repoConfig.passwd, "utf-8")}@${tempUriBlocks[1]}"
+            }
+        } else {
+            throw new Exception("SSH uri is not support!")
+        }
+    }
+
+    @Override
+    boolean hasCheckout() {
+        File dir = new File(outDir, ".git")
+        return dir.exists() && dir.isDirectory()
+    }
+
+    @Override
+    void update() {
+        if (hasCheckout()) {
+            App.logD("git pull")
+            App.exec("git pull ->", outDir,
+                    "git pull")
+        } else {
+            App.logD("git clone")
+            if (outDir.exists()) {
+                outDir.delete()
+            }
+            outDir.mkdir()
+            App.exec("git clone ->", "git clone --depth=1 ${wrapperUri()} \"${outDir.absolutePath}\"")
+        }
+    }
+
+    @Override
+    void upload() {
+
+    }
+}
+/**
+ * 參考：https://www.cnblogs.com/hk315523748/p/6178273.html
+ */
+class RepoSvn extends Repo {
+
+    RepoSvn(RepoConfig repoConfig) {
+        super(repoConfig)
+    }
+
+    @Override
+    boolean hasCheckout() {
+        File dir = new File(outDir, ".svn")
+        return dir.exists() && dir.isDirectory()
+    }
+
+    @Override
+    void update() {
+        if (hasCheckout()) {
+            App.logD("svn update")
+            App.exec("svn update ->",
+                    "svn update ${outDir.absolutePath} --username ${repoConfig.user} --password ${repoConfig.passwd}")
+        } else {
+            App.logD("svn checkout")
+            if (outDir.exists()) {
+                outDir.delete()
+            }
+            outDir.mkdir()
+            App.exec("svn checkout ->", "svn checkout \"${repoConfig.uri}\" \"${outDir.absolutePath}\" --username ${repoConfig.user} --password ${repoConfig.passwd}")
+        }
+    }
+
+    @Override
+    void upload() {
+
+    }
+}
+
+class RepoHelper {
+    final RepoConfig conf
+
+    RepoHelper(RepoConfig conf) {
+        this.conf = conf
+    }
+
+    boolean isSVN(String uri) {
+        if (uri == null) return false
+        if (uri.isEmpty()) return false
+        if (uri.startsWith("svn://")) return true
+        return false
+    }
+
+
+    boolean isGIT(String uri) {
+        if (uri == null) return false
+        if (uri.isEmpty()) return false
+        if (uri.endsWith(".git") && (
+                uri.startsWith("https://")
+                        || uri.startsWith("http://")
+                        || uri.contains("@"))) return true
+        return false
+    }
+
+    Repo connectRepo() {
+        if (conf.uri.isEmpty()) {
+            App.logD("Please config \"uri\":\"${conf.uri}\" in ${App.confFileName}")
+            return null
+        }
+        if (isSVN(conf.uri)) {
+            return new RepoSvn(conf)
+        }
+        if (isGIT(conf.uri)) {
+            return new RepoGit(conf)
+        }
+        return null
+    }
+
+}
+
+class MavenConf {
+    String mavenId = ""
+    ArrayList<RepoConfig> repoConfigs = new ArrayList<>()
+
+    static void createConfFile(File file) {
+        if (!file.exists()) {
+            file.createNewFile()
+            file.write(JsonOutput.prettyPrint(JsonOutput.toJson(
+                    [mavenId: "org.vcslib:demo:0.0.1", repos: [[uri: "", user: "", passwd: ""]]])))
+        }
+    }
+
+    static MavenConf from(File file) {
+        if (file.exists()) {
+            MavenConf mavenConf = new MavenConf()
+            HashMap<String, Object> map = new JsonSlurperClassic().parse(file)
+            mavenConf.mavenId = map.mavenId
+            mavenConf.repoConfigs = map.repos as ArrayList<RepoConfig>
+            return mavenConf
+        } else {
+            return null
+        }
+    }
+}
+
+/**
+ * *******************************************************************************************************
+ * 开始执行初始化配置
+ */
+final HashMap<StringUtil, Repo> repoConfigs = RepoConfig.loadMergeConfs(rootDir, projectDir)
+final MavenConf mavenConf = MavenConf.from(new File(projectDir, App.mavenConfFileName))
+App.logD("vcsLibUpdateLimit exec...")
+repoConfigs.values().each {
+    Repo repo = new RepoHelper(it).connectRepo()
+    if (repo != null) {
+        repo.updateWithLimit()
+    }
+}
+App.logD("vcsLibUpdateLimit is completed")
+buildscript.repositories {
+    for (String key : repoConfigs.keySet()) {
+        maven { url RepoConfig.outDir(key).toPath() }
+    }
+}
+repositories {
+    for (String key : repoConfigs.keySet()) {
+        maven { url RepoConfig.outDir(key).toPath() }
+    }
+}
+
+/**
+ * **********************************************************************************************************
+ * 开始创建任务
+ */
+/**
+ * 无限制的更新maven仓库
+ */
+task vcsLibUpdate(group: "vcsLib") {
+    doFirst {
+        App.logD("vcsLibUpdate exec...")
+        repoConfigs.values().each {
+            Repo repo = new RepoHelper(it).connectRepo()
+            if (repo != null) {
+                repo.update()
+            }
+        }
+        App.logD("vcsLibUpdate is completed")
+    }
+}
+
+/**
+ * 有限制的更新maven仓库，加快编译速度，一般过滤掉1小时以内的更新任务
+ */
+task vcsLibUpdateLimit(group: "vcsLib") {
+    doFirst {
+        App.logD("vcsLibUpdateLimit exec...")
+        repoConfigs.values().each {
+            Repo repo = new RepoHelper(it).connectRepo()
+            if (repo != null) {
+                repo.updateWithLimit()
+            }
+        }
+        App.logD("vcsLibUpdate is completed")
+    }
+}
+
+/**
+ * 用于提交上传当前的改动至远程maven仓库
+ */
+task vcsLibUpload(group: "vcsLib") {
+    doFirst {
+        App.logD("vcsLibUpload exec...")
+        repoConfigs.values().each {
+            Repo repo = new RepoHelper(it).connectRepo()
+            if (repo != null) {
+                repo.upload()
+            }
+        }
+        App.logD("vcsLibUpload is completed")
+    }
+}
+
+if (mavenConf == null) {
+    /**
+     *
+     * 创建一个vcsLib的配置文件
+     */
+    task vcsLibCreate(group: "vcsLib") {
+        doFirst {
+            MavenConf.createConfFile(new File(projectDir, App.mavenConfFileName))
+            App.logE("Please re-run the configuration Gradle Sync To take effect")
+        }
+    }
+} else {
+    /**
+     * 部署maven库
+     * 先执行maven，再执行vcsLibUpdate，再执行vcsLibUpload
+     */
+    task vcsLibDeploy(group: "vcsLib") {
+        doFirst {
+        }
+    }
+}
+
+
+
+
+
+
+
+

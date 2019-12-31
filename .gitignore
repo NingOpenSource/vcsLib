@@ -12,4 +12,5 @@ temp.conf.json
 *.log
 vcsLib.conf.json
 vcsLib.json
+vcsLib.maven.json
 
