@@ -5,7 +5,7 @@ import org.codehaus.groovy.util.StringUtil
 import java.nio.charset.Charset
 import java.text.SimpleDateFormat
 
-final String VERSION_NAME = "3.0.3_dev"
+final String VERSION_NAME = "3.0.2"
 
 println("\r\n************************\r\n"
         + "** APPLYON: ${projectDir.absolutePath}\r\n"
