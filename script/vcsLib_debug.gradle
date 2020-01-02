@@ -1,7 +1,7 @@
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurperClassic
 import org.codehaus.groovy.util.StringUtil
-
+import org.gradle.api.publication.maven.internal.deployer.DefaultGroovyMavenDeployer
 import java.nio.charset.Charset
 import java.text.SimpleDateFormat
 
@@ -284,7 +284,7 @@ class RepoSvn extends Repo {
         }
     }
 
-    void svnStatus(){
+    void svnStatus() {
         App.exec("svn status ->", outDir, "svn status").each {
             if (it.startsWith("?")) {//The new file
                 String path = it.substring(1, it.length()).trim()
@@ -502,15 +502,32 @@ if (mavenConf != null) {//配置maven
         }
     }
     uploadArchives {
-        repositories {
-            for (RepoConfig item : mavenConf.repoConfigs) {
+//        DefaultGroovyMavenDeployer deploy=new DefaultGroovyMavenDeployer()
+        for (RepoConfig item : mavenConf.repoConfigs) {
+            repositories {
                 mavenDeployer {
                     repository(url: RepoConfig.outDir(item.uri).toURI())
                     pom.version = mVersion
                     pom.artifactId = mArtifactId
                 }
             }
+            println("00000000000000000000000000000000000000000000000000000000000" + item.uri)
+
+//            repositories {
+//                mavenDeployer {
+//                    repository(url: RepoConfig.outDir(item.uri).toURI())
+//                    pom.version = mVersion
+//                    pom.artifactId = mArtifactId
+//                }
+//            }
         }
+    }
+    for (MavenResolver resolver : uploadArchives.getRepositories().withType(MavenResolver.class)) {
+        DefaultGroovyMavenDeployer deployer = resolver
+        println("0000000000000000000000000000    " + deployer.pom)
+        println("0000000000000000000000000000    " + deployer.pomFilterContainer)
+        println("0000000000000000000000000000    " + deployer.activePomFilters)
+        println("0000000000000000000000000000    " + deployer.settings)
     }
 }
 

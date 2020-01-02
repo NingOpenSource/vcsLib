@@ -5,3 +5,5 @@ include ':plugin-gradle',':gui',':terminal'
 
 //includeBuild("./buildSrcTemp")
 
+include ':demo:java_library'
+

@@ -3,6 +3,11 @@ package org.yanning.gradle.vcs_lib
 import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.artifacts.maven.MavenResolver
+import org.gradle.api.artifacts.repositories.MavenArtifactRepository
+import org.gradle.api.plugins.MavenPlugin
+import org.gradle.api.publication.maven.internal.deployer.DefaultGroovyMavenDeployer
+import org.gradle.api.tasks.Upload
 import org.yanning.gradle.vcs_lib.core.AppConfig
 import org.yanning.gradle.vcs_lib.core.RepoConfig
 import org.yanning.gradle.vcs_lib.extension.RepoHelper
@@ -141,5 +146,9 @@ class vcsLibPlugin : Plugin<Project> {
 //            }
 //            target.plugins.apply(MavenPlugin::class.java)
 //        }
+
+        target.extensions.findByType(Upload::class.java)?.repositories?.withType(DefaultGroovyMavenDeployer::class.java)?.get(0)?.apply {
+
+        }
     }
 }

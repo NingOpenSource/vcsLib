@@ -1,0 +1,53 @@
+apply plugin: 'java'
+apply plugin: 'java-library'
+apply plugin: 'maven'
+
+group 'org.yanning.vcsLib.java_lib'
+version '0.0.1'
+
+sourceCompatibility = 1.8
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.java.srcDirs
+    archiveClassifier = 'sources'
+}
+
+//task javadoc(type: Javadoc) {
+//    if (JavaVersion.current().isJava9Compatible()) {
+//        options.addBooleanOption('html5', true)
+//    }
+//    options.encoding = "UTF-8"
+//    source = sourceSets.main.java.srcDirs
+//    classpath += project.files(getBootClasspath().join(File.pathSeparator))
+//}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    archiveClassifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+tasks.withType(Javadoc) {
+    options.addStringOption('Xdoclint:none', '-quiet')
+    options.addStringOption('encoding', 'UTF-8')
+    options.addStringOption('charSet', 'UTF-8')
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: new File("doc/maven_temp").toURI())
+            pom.version = version
+            pom.artifactId = 'java-lib'
+        }
+    }
+}
+
+
+repositories {
+    mavenCentral()
+}
