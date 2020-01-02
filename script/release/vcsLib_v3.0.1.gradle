@@ -24,7 +24,7 @@ println("\r\n************************\r\n"
  *
  */
 final class App {
-    static final boolean isDebug = true
+    static boolean isDebug = false
     static final String confFileName = "vcsLib.json"
     static final String mavenConfFileName = "vcsLib.publish.json"
 
@@ -271,6 +271,7 @@ class RepoSvn extends Repo {
     void update() {
         if (hasCheckout()) {
             App.logD("svn update")
+            svnStatus()
             App.exec("svn update ->",
                     "svn update ${outDir.absolutePath} --username ${repoConfig.user} --password ${repoConfig.passwd}")
         } else {
@@ -283,9 +284,7 @@ class RepoSvn extends Repo {
         }
     }
 
-    @Override
-    void upload() {
-        App.logD("svn upload")
+    void svnStatus(){
         App.exec("svn status ->", outDir, "svn status").each {
             if (it.startsWith("?")) {//The new file
                 String path = it.substring(1, it.length()).trim()
@@ -295,6 +294,12 @@ class RepoSvn extends Repo {
                 App.exec("svn delete ->", outDir, "svn delete \"$path\"")
             }
         }
+    }
+
+    @Override
+    void upload() {
+        App.logD("svn upload")
+        svnStatus()
         String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())
         App.exec("svn commit ->", outDir, "svn commit -m \"commit from vcsLib plugin at $time\"")
     }
@@ -370,6 +375,13 @@ class MavenConf {
  * *******************************************************************************************************
  * 开始执行初始化配置
  */
+try {
+    if (vcsLibDebugMode) {
+        App.isDebug = true
+        App.logE("debug mode is opened...")
+    }
+} catch (Throwable _) {
+}
 final HashMap<StringUtil, Repo> repoConfigs = RepoConfig.loadMergeConfs(rootDir, projectDir)
 final MavenConf mavenConf = MavenConf.from(new File(projectDir, App.mavenConfFileName))
 App.logD("vcsLibUpdateLimit is starting...")
@@ -553,7 +565,7 @@ if (mavenConf == null) {
     /**
      * 用于发布版本时检查仓库信息
      */
-    task vcsLibPublishCheck(group: "vcsLib publish") {
+    task vcsLibPublishCheck(group: "vcsLib") {
         doFirst {
             App.logD("vcsLibPublishCheck is starting...")
             for (RepoConfig item : mavenConf.repoConfigs) {
@@ -569,7 +581,7 @@ if (mavenConf == null) {
      * 部署maven库
      * 先执行maven的uploadArchives
      */
-    task vcsLibPublish(group: "vcsLib publish") {
+    task vcsLibPublish(group: "vcsLib") {
         doFirst {
             App.logD("vcsLibPublish is starting...")
             for (RepoConfig item : mavenConf.repoConfigs) {
