@@ -13,4 +13,5 @@ temp.conf.json
 vcsLib.conf.json
 vcsLib.json
 vcsLib.maven.json
-
+vcsLib.maven.backup.json
+vcsLib.publish.json

@@ -3,15 +3,19 @@ import groovy.json.JsonSlurperClassic
 import org.codehaus.groovy.util.StringUtil
 
 import java.nio.charset.Charset
+import java.text.SimpleDateFormat
+
+final String VERSION_NAME = "3.0.1"
 
 println("\r\n************************\r\n"
+        + "** APPLYON: ${projectDir.absolutePath}\r\n"
         + "** NAME   : vcsLib gradle script (Using the local svn / git command)\r\n"
-        + "** VERSION: 3.0.1\r\n"
+        + "** VERSION: $VERSION_NAME\r\n"
         + "** NOTE   : only support master branch on git\r\n"
         + "** Instructions and source code can be accessed at the following address:\r\n"
         + "**   github -> https://github.com/NingOpenSource/vcsLib\r\n"
         + "**   gitee  -> https://gitee.com/NingOpenSource/vcsLib\r\n"
-        + "************************\r\n\r\n")
+        + "************************\r\n")
 /**
  ************* vcsLib gradle脚本版（使用本地的svn/git命令）*************************
  * 请注意，git上的maven不支持分支和标签，可以修改此文件获取支持
@@ -22,7 +26,8 @@ println("\r\n************************\r\n"
 final class App {
     static final boolean isDebug = true
     static final String confFileName = "vcsLib.json"
-    static final String mavenConfFileName = "vcsLib.maven.json"
+    static final String mavenConfFileName = "vcsLib.publish.json"
+
     /**
      * 软件存储主目录
      */
@@ -45,21 +50,27 @@ final class App {
         System.err.println("vcsLib: $text")
     }
 
-    static void exec(String tag, String cmd) {
-        exec(tag, null, cmd)
+    static ArrayList<String> exec(String tag, String cmd) {
+        return exec(tag, null, cmd)
     }
 
-    static void exec(String tag, File dir, String cmd) {
+    static ArrayList<String> exec(String tag, File dir, String cmd) {
+        final String charsetOut = "utf-8"//用于校正windows操作系统下出现的文件名中文乱码
+        logD("$tag ${new String(cmd.getBytes(charsetOut), Charset.defaultCharset())}")
+        ArrayList<String> result = new ArrayList<>()
         String[] envp = ["LC_MESSAGES=en_US"]//设置svn输出英文，中文输出在某些特殊操作系统（或IDE）下会出现乱码
         Process process = Runtime.getRuntime().exec(cmd, envp, dir)
         String lineText = null
         BufferedReader reader = process.in.newReader()
         while ((lineText = reader.readLine()) != null) {
+            result.add(lineText)
+            lineText = new String(lineText.getBytes(charsetOut), Charset.defaultCharset())
             logD("$tag $lineText")
         }
         reader.close()
         BufferedReader errorReader = process.errorStream.newReader()
         while ((lineText = errorReader.readLine()) != null) {
+            lineText = new String(lineText.getBytes(charsetOut), Charset.defaultCharset())
             logD("$tag $lineText")
         }
         errorReader.close()
@@ -68,6 +79,7 @@ final class App {
         lineText = null
         envp = null
         process = null
+        return result
     }
 }
 
@@ -106,6 +118,7 @@ class RepoConfig {
                 rootConfMap.put(key, rc)
             }
         }
+        return rootConfMap
     }
 
     private static HashMap<String, RepoConfig> loadConfs(File file) {
@@ -156,6 +169,9 @@ abstract class Repo {
      * 可防止重复更新操作，加快编译速度
      */
     void updateWithLimit() {
+        if (!outDir.exists() && updateTagFile.exists()) {
+            updateTagFile.delete()
+        }
         if (!updateTagFile.exists()) {
             updateTagFile.createNewFile()
             update()
@@ -166,6 +182,7 @@ abstract class Repo {
             App.logD("repo(${repoConfig.uri}) has updated!(limit time is 1h, you can update force by 'gradle vcsLibUpdate')")
         }
     }
+
 }
 
 class RepoGit extends Repo {
@@ -178,7 +195,8 @@ class RepoGit extends Repo {
      * @return
      */
     private String wrapperUri() {
-        if (repoConfig.user.isEmpty() || repoConfig.passwd.isEmpty()) {//一般可能时公开的git仓库，或者本地文件夹的绝对路径或者形如file://的uri路径
+        if (repoConfig.user.isEmpty() || repoConfig.passwd.isEmpty()) {
+//一般可能时公开的git仓库，或者本地文件夹的绝对路径或者形如file://的uri路径,或者配置好公钥的ssh地址
             return repoConfig.uri
         }
         if (repoConfig.uri.contains("https://") || repoConfig.uri.contains("http://")) {
@@ -218,7 +236,20 @@ class RepoGit extends Repo {
 
     @Override
     void upload() {
-
+        App.logD("git upload")
+        App.exec("git config user.email ->", outDir,
+                "git config user.email ${repoConfig.user}")
+        App.exec("git config user.name ->", outDir,
+                "git config user.name ${repoConfig.user}")
+        App.exec("git add * ->", outDir,
+                "git add *")
+        App.exec("git add * ->", outDir,
+                "git add *")
+        String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())
+        App.exec("git commit -a->", outDir,
+                "git commit -a -m \"commit from vcsLib plugin at $time\"")
+        App.exec("git push->", outDir,
+                "git push")
     }
 }
 /**
@@ -254,7 +285,18 @@ class RepoSvn extends Repo {
 
     @Override
     void upload() {
-
+        App.logD("svn upload")
+        App.exec("svn status ->", outDir, "svn status").each {
+            if (it.startsWith("?")) {//The new file
+                String path = it.substring(1, it.length()).trim()
+                App.exec("svn add ->", outDir, "svn add \"$path\"")
+            } else if (it.startsWith("!")) {//Deleted Files
+                String path = it.substring(1, it.length()).trim()
+                App.exec("svn delete ->", outDir, "svn delete \"$path\"")
+            }
+        }
+        String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())
+        App.exec("svn commit ->", outDir, "svn commit -m \"commit from vcsLib plugin at $time\"")
     }
 }
 
@@ -268,7 +310,7 @@ class RepoHelper {
     boolean isSVN(String uri) {
         if (uri == null) return false
         if (uri.isEmpty()) return false
-        if (uri.startsWith("svn://")) return true
+        if (uri.startsWith("svn://") || uri.startsWith("svn+ssh://")) return true
         return false
     }
 
@@ -330,8 +372,8 @@ class MavenConf {
  */
 final HashMap<StringUtil, Repo> repoConfigs = RepoConfig.loadMergeConfs(rootDir, projectDir)
 final MavenConf mavenConf = MavenConf.from(new File(projectDir, App.mavenConfFileName))
-App.logD("vcsLibUpdateLimit exec...")
-repoConfigs.values().each {
+App.logD("vcsLibUpdateLimit is starting...")
+repoConfigs.values().each {//更新用于依赖的maven仓库
     Repo repo = new RepoHelper(it).connectRepo()
     if (repo != null) {
         repo.updateWithLimit()
@@ -349,6 +391,117 @@ repositories {
     }
 }
 
+if (mavenConf != null) {//配置maven
+    String[] mavenIdInfo = mavenConf.mavenId.split(":")
+    if (mavenIdInfo.length != 3 || mavenIdInfo[0].length() == 0 || mavenIdInfo[1].length() == 0 || mavenIdInfo[2].length() == 0) {
+        App.logE("config maven: mavenId=${mavenConf.mavenId} is wrong!")
+        return
+    }
+    String mGroup = mavenIdInfo[0]
+    String mArtifactId = mavenIdInfo[1]
+    String mVersion = mavenIdInfo[2]
+    if (!plugins.hasPlugin('maven'))
+        apply plugin: 'maven'
+    group mGroup
+    version mVersion
+    if (plugins.hasPlugin("kotlin-android")) {//适用于带有kotlin语言的android库发布
+        if (!plugins.hasPlugin('org.jetbrains.dokka')) {//加入kotlin的doc生成工具
+            /**
+             buildscript {repositories {google()
+             jcenter()}dependencies {classpath "org.jetbrains.dokka:dokka-gradle-plugin:0.9.18"}}*/
+            apply plugin: 'org.jetbrains.dokka'
+        }
+        if (tasks.findByName('generateSourcesJar') == null)
+            task generateSourcesJar(type: Jar) {
+                group = 'jar'
+                from android.sourceSets.main.java.srcDirs
+                archiveClassifier = 'sources'
+            }
+        if (tasks.findByName('javadoc') == null)
+            task javadoc(type: Javadoc) {
+                source = android.sourceSets.main.java.srcDirs
+                classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+            }
+
+        if (tasks.findByName('dokkaJavadoc') == null)
+            task dokkaJavadoc(type: dokka.getClass()) {
+                outputFormat = "javadoc"
+                outputDirectory = javadoc.destinationDir
+            }
+
+        if (tasks.findByName('generateJavadoc') == null)
+            task generateJavadoc(type: Jar, dependsOn: dokkaJavadoc) {
+                group = 'jar'
+                archiveClassifier = 'javadoc'
+                from javadoc.destinationDir
+            }
+        artifacts {
+            archives generateJavadoc
+            archives generateSourcesJar
+        }
+    } else {
+        if (plugins.hasPlugin("com.android.library")) {//适用于不带有kotlin语言的标准android库发布
+            if (tasks.findByName('sourcesJar') == null)
+                task sourcesJar(type: Jar) {
+                    from android.sourceSets.main.java.srcDirs
+                    archiveClassifier = 'sources'
+                }
+            if (tasks.findByName('javadoc') == null)
+                task javadoc(type: Javadoc) {
+                    if (JavaVersion.current().isJava9Compatible()) {
+                        options.addBooleanOption('html5', true)
+                    }
+                    options.encoding = "UTF-8"
+                    source = android.sourceSets.main.java.srcDirs
+                    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+                }
+        } else if (plugins.hasPlugin("java-library")) {//适用于带有标准java语言jar库发布
+            if (tasks.findByName('sourcesJar') == null)
+                task sourcesJar(type: Jar) {
+                    from sourceSets.main.java.srcDirs
+                    archiveClassifier = 'sources'
+                }
+            if (tasks.findByName('javadoc') == null)
+                task javadoc(type: Javadoc) {
+                    if (JavaVersion.current().isJava9Compatible()) {
+                        options.addBooleanOption('html5', true)
+                    }
+                    options.encoding = "UTF-8"
+                    source = sourceSets.main.java.srcDirs
+                    classpath += project.files(getBootClasspath().join(File.pathSeparator))
+                }
+        }
+        if (tasks.findByName('javadocJar') == null && project.properties.containsKey('javadoc')) {
+            task javadocJar(type: Jar, dependsOn: javadoc) {
+                archiveClassifier = 'javadoc'
+                from javadoc.destinationDir
+            }
+        }
+        if (tasks.findByName('javadocJar') != null && tasks.findByName('sourcesJar') != null) {
+            artifacts {
+                archives javadocJar
+                archives sourcesJar
+            }
+        }
+        tasks.withType(Javadoc) {
+            options.addStringOption('Xdoclint:none', '-quiet')
+            options.addStringOption('encoding', 'UTF-8')
+            options.addStringOption('charSet', 'UTF-8')
+        }
+    }
+    uploadArchives {
+        repositories {
+            for (RepoConfig item : mavenConf.repoConfigs) {
+                mavenDeployer {
+                    repository(url: RepoConfig.outDir(item.uri).toURI())
+                    pom.version = mVersion
+                    pom.artifactId = mArtifactId
+                }
+            }
+        }
+    }
+}
+
 /**
  * **********************************************************************************************************
  * 开始创建任务
@@ -358,7 +511,7 @@ repositories {
  */
 task vcsLibUpdate(group: "vcsLib") {
     doFirst {
-        App.logD("vcsLibUpdate exec...")
+        App.logD("vcsLibUpdate is starting...")
         repoConfigs.values().each {
             Repo repo = new RepoHelper(it).connectRepo()
             if (repo != null) {
@@ -374,7 +527,7 @@ task vcsLibUpdate(group: "vcsLib") {
  */
 task vcsLibUpdateLimit(group: "vcsLib") {
     doFirst {
-        App.logD("vcsLibUpdateLimit exec...")
+        App.logD("vcsLibUpdateLimit is starting...")
         repoConfigs.values().each {
             Repo repo = new RepoHelper(it).connectRepo()
             if (repo != null) {
@@ -385,28 +538,12 @@ task vcsLibUpdateLimit(group: "vcsLib") {
     }
 }
 
-/**
- * 用于提交上传当前的改动至远程maven仓库
- */
-task vcsLibUpload(group: "vcsLib") {
-    doFirst {
-        App.logD("vcsLibUpload exec...")
-        repoConfigs.values().each {
-            Repo repo = new RepoHelper(it).connectRepo()
-            if (repo != null) {
-                repo.upload()
-            }
-        }
-        App.logD("vcsLibUpload is completed")
-    }
-}
-
 if (mavenConf == null) {
     /**
      *
      * 创建一个vcsLib的配置文件
      */
-    task vcsLibCreate(group: "vcsLib") {
+    task vcsLibPublishInit(group: "vcsLib") {
         doFirst {
             MavenConf.createConfFile(new File(projectDir, App.mavenConfFileName))
             App.logE("Please re-run the configuration Gradle Sync To take effect")
@@ -414,19 +551,37 @@ if (mavenConf == null) {
     }
 } else {
     /**
-     * 部署maven库
-     * 先执行maven，再执行vcsLibUpdate，再执行vcsLibUpload
+     * 用于发布版本时检查仓库信息
      */
-    task vcsLibDeploy(group: "vcsLib") {
+    task vcsLibPublishCheck(group: "vcsLib publish") {
         doFirst {
+            App.logD("vcsLibPublishCheck is starting...")
+            for (RepoConfig item : mavenConf.repoConfigs) {
+                Repo repo = new RepoHelper(item).connectRepo()
+                if (repo != null) {
+                    repo.update()
+                }
+            }
+            App.logD("vcsLibPublishCheck is completed")
         }
     }
+    /**
+     * 部署maven库
+     * 先执行maven的uploadArchives
+     */
+    task vcsLibPublish(group: "vcsLib publish") {
+        doFirst {
+            App.logD("vcsLibPublish is starting...")
+            println("mavenConf.repoConfigs---------------->" + mavenConf.repoConfigs)
+            for (RepoConfig item : mavenConf.repoConfigs) {
+                Repo repo = new RepoHelper(item).connectRepo()
+                if (repo != null) {
+                    repo.upload()
+                }
+            }
+            App.logD("vcsLibPublish is completed")
+        }
+    }
+    uploadArchives.dependsOn(vcsLibPublishCheck)
+    vcsLibPublish.dependsOn(uploadArchives)
 }
-
-
-
-
-
-
-
-
