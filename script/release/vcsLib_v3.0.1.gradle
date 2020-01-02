@@ -572,7 +572,6 @@ if (mavenConf == null) {
     task vcsLibPublish(group: "vcsLib publish") {
         doFirst {
             App.logD("vcsLibPublish is starting...")
-            println("mavenConf.repoConfigs---------------->" + mavenConf.repoConfigs)
             for (RepoConfig item : mavenConf.repoConfigs) {
                 Repo repo = new RepoHelper(item).connectRepo()
                 if (repo != null) {
