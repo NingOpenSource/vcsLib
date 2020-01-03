@@ -428,7 +428,19 @@ void configUploadArchives(String mavenId, RepoConfig repoConfig) {
             /**
              buildscript {repositories {google()
              jcenter()}dependencies {classpath "org.jetbrains.dokka:dokka-gradle-plugin:0.9.18"}}*/
-            apply plugin: 'org.jetbrains.dokka'
+            try {
+				apply plugin: 'org.jetbrains.dokka'
+			} catch(Throwable _){
+				App.logE("please config:\r\n"
+					+"  buildscript {\r\n"
+					+"    repositories {\r\n"
+					+"      jcenter()\r\n"
+					+"    }\r\n"
+					+"    dependencies {\r\n"
+					+"      classpath 'org.jetbrains.dokka:dokka-gradle-plugin:0.9.18'\r\n"
+					+"    }\r\n"
+					+"  }\r\n")
+			}
         }
         if (tasks.findByName('generateSourcesJar') == null)
             task generateSourcesJar(type: Jar) {
