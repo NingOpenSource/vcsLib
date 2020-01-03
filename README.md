@@ -1,5 +1,7 @@
 # vcsLib（v2.0.0-alpha-003）
 
+
+
 v2.0版本测试中，改进方向
 1. 配置不再放在`build.gradle`中，新建配置文件`vcsLib.properties`（完成）
 1. 提供一个GUI版本的配置工具（正在进行...）
@@ -19,6 +21,9 @@ v2.0版本测试中，改进方向
 https://www.jianshu.com/p/944bb00355e2
 
 https://github.com/zacker330/jshint-gradle
+
+maven官方同样也在开发类似的插件：[http://maven.apache.org/wagon/wagon-providers/wagon-scm/](http://maven.apache.org/wagon/wagon-providers/wagon-scm/)
+
 ### How to use?
 
 1. config step 1>>`$rootDir/build.gradle`:
