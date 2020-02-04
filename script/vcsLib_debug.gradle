@@ -283,7 +283,8 @@ class RepoSvn extends Repo {
                 outDir.delete()
             }
             outDir.mkdir()
-            App.exec("svn checkout ->", "svn checkout ${repoConfig.uri} \"${outDir.absolutePath}\" --username ${repoConfig.user} --password ${repoConfig.passwd}")
+            App.exec("svn checkout ->", "svn checkout ${repoConfig.uri} ${outDir.absolutePath} --username ${repoConfig.user} --password ${repoConfig.passwd}")
+//            App.exec("svn checkout ->", "svn checkout \"${repoConfig.uri}\" \"${outDir.absolutePath}\" --username ${repoConfig.user} --password ${repoConfig.passwd}")
         }
     }
 
